@@ -79,8 +79,8 @@ function create(){
   const wing=(idx,side)=>{
    const left=xs[idx],right=xs[idx+1],base=side==='top'?bodyY:bodyEnd;
    const dir=side==='top'?-1:1,outer=base+dir*dust,jog=W*.015,bevel=W*.15,step=W*.09;
-   if(side==='top'&&idx===1)path([[left,base],[left+jog,base+dir*step],[left+bevel,outer],[right,outer]]);
-   else if(side==='top')path([[left,outer],[right-bevel,outer],[right-jog,base+dir*step],[right,base]]);
+   if(side==='top'&&idx===1)path([[left,base],[left+jog,base+dir*step],[left+bevel,outer],[right,outer],[right,base]]);
+   else if(side==='top')path([[left,base],[left,outer],[right-bevel,outer],[right-jog,base+dir*step],[right,base]]);
    else if(idx===1)path([[left,base],[left,outer],[right-bevel,outer],[right-jog,base+dir*step],[right,base]]);
    else path([[left,base],[left+jog,base+dir*step],[left+bevel,outer],[right,outer],[right,base]]);
    add(left,base,right,base,'crease');
