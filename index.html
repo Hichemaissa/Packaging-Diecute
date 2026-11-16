@@ -14,6 +14,28 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 .layout{display:grid;grid-template-columns:350px minmax(0,1fr);gap:20px;align-items:start}.panel{background:#fff;border:1px solid var(--line);border-radius:17px;box-shadow:0 8px 22px #1a40600a;overflow:hidden}.phead{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.phead h3{margin:0;font-size:16px}.pbody{padding:19px}.muted{color:var(--muted)}.small{font-size:12px}.group{margin-bottom:20px}.group:last-child{margin-bottom:0}.group-title{font-size:13px;font-weight:800;margin:0 0 10px}.templates{display:grid;gap:9px}.template{width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;padding:13px;text-align:right;display:flex;gap:10px;align-items:center}.template.active{background:#ebf6fa;border-color:#75b9cb;box-shadow:inset 0 0 0 1px #75b9cb}.ticon{flex-shrink:0;width:35px;height:35px;border-radius:10px;background:#e9f0f5;display:grid;place-items:center;font-size:20px}.template.active .ticon{background:#d2edf1}.template strong{display:block;font-size:13px}.template small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{min-width:0}.field.full{grid-column:span 2}.field label{display:block;font-size:12px;font-weight:750;margin-bottom:6px}.input-wrap{position:relative}.input-wrap input{width:100%;height:44px;border:1px solid #cfdbe4;border-radius:10px;padding:8px 11px 8px 41px;direction:ltr;text-align:left;font-variant-numeric:tabular-nums;color:var(--ink);background:#fff;font-weight:700}.input-wrap input:focus{outline:2px solid #8ad0dc;border-color:var(--blue)}.input-wrap span{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#7d91a3;pointer-events:none}.field-note{font-size:11px;color:var(--muted);margin-top:6px}.action{border:0;border-radius:11px;padding:13px 14px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px}.action.primary{background:var(--blue);color:white}.action.secondary{background:#e7f3f6;color:#155e78}.action.ghost{background:white;color:#30576b;border:1px solid #ccdae5}.action:hover{filter:brightness(.96)}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions .action{flex:1;white-space:nowrap;font-size:13px}.helper{border-radius:11px;background:#f1f6f9;padding:12px 13px;font-size:12px;line-height:1.8;color:#3b647a}.alert{margin-top:12px;border:1px solid #f1d5a7;background:#fffaf0;border-radius:11px;padding:12px 13px;line-height:1.8;color:#805722;font-size:12px}
 .workspace{min-width:0}.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}.legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:12px;color:#536d7f}.legend span{display:inline-flex;gap:7px;align-items:center}.swatch{display:block;width:24px;height:0;border-top:3px solid var(--red)}.swatch.fold{border-top:3px solid #159b65}.canvas{position:relative;background-color:#fdfefe;background-image:linear-gradient(to right,#d9e4ea55 1px,transparent 1px),linear-gradient(to bottom,#d9e4ea55 1px,transparent 1px);background-size:21px 21px;min-height:460px;display:flex;align-items:center;justify-content:center;padding:30px 22px;overflow:auto}.canvas svg{width:100%;height:auto;max-height:none;display:block;overflow:visible;filter:drop-shadow(0 3px 8px #2b567722)}.canvas:after{content:'PREVIEW • NOT TO SCALE';direction:ltr;position:absolute;bottom:13px;left:18px;color:#91a6b4;letter-spacing:1px;font-size:10px;font-weight:800;pointer-events:none}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line)}.stat{padding:17px;background:white}.stat b{display:block;font-size:17px;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}.stat small{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}.guidance{margin-top:18px;padding:19px 22px;line-height:1.8;color:var(--muted);font-size:13px}.guidance b{color:var(--ink)}.footer{font-size:11px;color:#8ca0ae;text-align:center;margin-top:28px}.error{background:#fff1f1;border:1px solid #f1c4c4;color:#a12929;border-radius:9px;padding:10px 12px;margin:10px 0;font-size:12px;display:none}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.canvas{min-height:390px}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:520px){header{padding:17px}.header-chip{display:none}main{padding:18px 12px 30px}.intro h2{font-size:21px}.intro{gap:10px}.canvas{min-height:300px;padding:18px 10px}.stat{padding:12px 7px}.stat b{font-size:13px}.stat small{font-size:10px}.pbody{padding:16px}.action{padding:12px 10px}.actions .action{font-size:12px}}
+
+/* Assembly preview is independent of the production dieline. */
+.assembly-view{height:350px;perspective:1050px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,#f5fbff,#e8f1f7)}
+.assembly-scene{position:relative;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-34deg);touch-action:none;cursor:grab}
+.assembly-scene:active{cursor:grabbing}
+.assembly-box{position:absolute;transform-style:preserve-3d;transform:translate3d(calc(var(--aw) * -.5),calc(var(--ah) * -.5),0)}
+.assembly-face{position:absolute;box-sizing:border-box;background:linear-gradient(130deg,#e5bd85,#cf9a5c);border:1.5px solid #956b3b;backface-visibility:visible;transform-style:preserve-3d}
+.assembly-front,.assembly-back{width:var(--aw);height:var(--ah)}
+.assembly-front{transform:translateZ(calc(var(--ad) * .5))}
+.assembly-back{transform:translateZ(calc(var(--ad) * -.5)) rotateY(180deg)}
+.assembly-left,.assembly-right{width:var(--ad);height:var(--ah);left:calc((var(--aw) - var(--ad)) / 2)}
+.assembly-left{transform:translateX(calc(var(--aw) * -.5)) rotateY(-90deg)}
+.assembly-right{transform:translateX(calc(var(--aw) * .5)) rotateY(90deg)}
+.assembly-top,.assembly-bottom{width:var(--aw);height:var(--ad);top:calc((var(--ah) - var(--ad)) / 2);transition:transform 1.1s ease}
+.assembly-top{transform:translateY(calc(var(--ah) * -.5)) rotateX(var(--topAngle))}
+.assembly-bottom{transform:translateY(calc(var(--ah) * .5)) rotateX(var(--bottomAngle))}
+.assembly-glue{position:absolute;width:16px;height:var(--ah);background:#e8b873;border:1px dashed #925f32;left:calc(var(--aw) - 8px);transform:translateZ(calc(var(--ad) * .5 + 2px));opacity:var(--glueOpacity);transition:opacity .8s}
+.assembly-box{opacity:var(--boxOpacity);transition:opacity .6s}
+.assembly-controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.assembly-controls input{flex:1;min-width:120px;accent-color:#0b5d9b}
+.assembly-controls button{padding:10px 13px}
+.assembly-note{font-size:12px;color:#536d7f;line-height:1.8;margin-top:12px}
 </style>
 </head>
 <body>
@@ -29,6 +51,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="helper">✓ الأحمر: <b>Cut</b> (قص)<br>✓ الأخضر المتصل: <b>Crease</b> (طي)<br>✓ الـ PDF متجهي بالأبعاد الحقيقية 1:1، وليس مجرد صورة.</div>
 </div></aside>
 <div class="workspace"><section class="panel"><div class="phead toolbar"><div><h3>معاينة المخطط الهندسي</h3><div id="templateDesc" class="small muted" style="margin-top:5px">RSC 0201 · Flat blank</div></div><div class="legend"><span><i class="swatch"></i> Cut</span><span><i class="swatch fold"></i> Crease</span></div></div><div class="canvas"><svg id="preview" aria-label="معاينة خطوط القص والطي" role="img" viewBox="0 0 600 410"></svg></div><div class="stats"><div class="stat"><small>عرض الفردة</small><b id="netW">—</b></div><div class="stat"><small>ارتفاع الفردة</small><b id="netH">—</b></div><div class="stat"><small>مساحة الفردة التقريبية</small><b id="area">—</b></div></div></section>
+<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><div class="assembly-scene" id="assemblyScene"><div class="assembly-box" id="assemblyBox"><div class="assembly-face assembly-front"></div><div class="assembly-face assembly-back"></div><div class="assembly-face assembly-left"></div><div class="assembly-face assembly-right"></div><div class="assembly-face assembly-top"></div><div class="assembly-face assembly-bottom"></div><div class="assembly-glue"></div></div></div></div><div class="pbody"><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="0" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">محاكاة تعليمية ثلاثية الأبعاد للطي واللصق؛ لا تمثل محاكاة ميكانيكية دقيقة أو نموذج تصنيع معتمدًا.</p></div></section>
 <section class="panel" style="margin-top:17px"><div class="phead"><h3>⬇️ تحميل ملفات التصميم</h3><span class="small muted">Vector Files</span></div><div class="pbody"><div class="actions"><button type="button" id="pdf" class="action primary">⬇ تحميل PDF (1:1)</button><button type="button" id="svg" class="action secondary">⬇ تحميل SVG</button></div><p class="small muted" style="line-height:1.8;margin:13px 0 0">PDF قابل للفتح في برامج التصميم والطباعة، وSVG متجهي قابل للتعديل في Illustrator أو Inkscape. عند الطباعة اختر <b>Actual Size / 100%</b> ولا تستعمل Fit to Page.</p></div></section>
 <div class="panel guidance"><b>تنبيه إنتاجي مهم:</b> هذا مولّد أولي لأنماط محددة، وليس بديلاً عن ArtiosCAD أو عن اعتماد نموذج تصنيع. الأبعاد اسمية؛ لم تُحتسب تعويضات سماكة الورق، الـ kerf، نوع الكرتون، قواعد التخديد، سماحية الماكينة أو اتجاه الألياف. لازم تجرّب عينة وتراجع خطوط القص والطي مع المطبعة قبل تصنيع القالب. <span id="tuckWarning"></span></div>
 </div></div>
@@ -109,7 +132,7 @@ function setTemplate(t){template=t;for(let k of ['rsc','tuck']){$('t-'+k).classL
  $('templateDesc').textContent=t==='rsc'?'RSC 0201 · Regular Slotted Container':'Tuck End · Reference dieline · Fix 05';
  $('tuckWarning').textContent=t==='tuck'?' تم إصلاح عرض الألسنة العلوية والسفلية في المعاينة. المطابقة الإنتاجية النهائية تحتاج فحص عينة.':'';
  update();}
-function update(){try{geometry=create();$('error').style.display='none';$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';}
+function update(){try{geometry=create();assemblyDims(geometry);$('error').style.display='none';$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';}
 catch(e){geometry=null;$('error').textContent=e.message;$('error').style.display='block';$('netW').textContent=$('netH').textContent=$('area').textContent='—';}}
 function download(blob,filename){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
 const mm2pt=n=>n*72/25.4;
@@ -148,6 +171,41 @@ $('generate').addEventListener('click',update);
 ['length','width','height','glue','slot'].forEach(id=>$(id).addEventListener('input',update));
 $('svg').addEventListener('click',()=>{update();if(geometry)download(new Blob([makeSvg(geometry,false)],{type:'image/svg+xml;charset=utf-8'}),safeName(geometry)+'.svg')});
 $('pdf').addEventListener('click',()=>{update();if(geometry)download(makePdf(geometry),safeName(geometry)+'.pdf')});
+
+const assemblyScene=$('assemblyScene'),assemblyBox=$('assemblyBox'),assemblyStep=$('assemblyStep'),assemblyStatus=$('assemblyStatus');
+let assemblyTimer=null,rotX=-24,rotY=-34,dragging=false,px=0,py=0;
+const assemblyStages=['فردة العلبة قبل التجميع','طي الواجهات لتشكيل جسم العلبة','لصق اللسان الجانبي','طي وإغلاق الألسنة السفلية','طي وإغلاق الألسنة العلوية'];
+function assemblyRender(){
+ const step=+assemblyStep.value;
+ assemblyBox.style.setProperty('--topAngle',step>=4?'90deg':'0deg');
+ assemblyBox.style.setProperty('--bottomAngle',step>=3?'-90deg':'0deg');
+ assemblyBox.style.setProperty('--glueOpacity',step===2?'1':'.12');
+ assemblyBox.style.setProperty('--boxOpacity',step===0?'.35':'1');
+ assemblyStatus.textContent=step+'/4 — '+assemblyStages[step]+'؛ اسحب النموذج لتدويره.';
+ $('assemblyPlay').textContent=assemblyTimer?'⏸ إيقاف':'▶ تشغيل التجميع';
+}
+function assemblyStop(){if(assemblyTimer!==null){clearInterval(assemblyTimer);assemblyTimer=null;}assemblyRender();}
+$('assemblyPlay').addEventListener('click',()=>{
+ if(assemblyTimer!==null){assemblyStop();return;}
+ if(+assemblyStep.value>=4)assemblyStep.value=0;
+ assemblyTimer=setInterval(()=>{const n=+assemblyStep.value;if(n>=4){assemblyStop();return;}assemblyStep.value=n+1;assemblyRender();if(n+1===4)assemblyStop();},1400);
+ assemblyRender();
+});
+$('assemblyReset').addEventListener('click',()=>{assemblyStop();assemblyStep.value=0;assemblyRender();});
+assemblyStep.addEventListener('input',()=>{assemblyStop();assemblyRender();});
+function assemblyDims(g){
+ const scale=Math.min(165/g.L,155/g.H,120/g.W,1.5);
+ assemblyBox.style.setProperty('--aw',Math.max(30,g.L*scale)+'px');
+ assemblyBox.style.setProperty('--ah',Math.max(35,g.H*scale)+'px');
+ assemblyBox.style.setProperty('--ad',Math.max(22,g.W*scale)+'px');
+ assemblyRender();
+}
+function assemblyRotate(){assemblyScene.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';}
+assemblyScene.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;assemblyScene.setPointerCapture(e.pointerId);});
+assemblyScene.addEventListener('pointermove',e=>{if(!dragging)return;rotY+=(e.clientX-px)*.5;rotX-=(e.clientY-py)*.5;px=e.clientX;py=e.clientY;assemblyRotate();});
+assemblyScene.addEventListener('pointerup',()=>dragging=false);
+assemblyScene.addEventListener('pointercancel',()=>dragging=false);
+
 setTemplate('tuck');
 })();
 </script>
