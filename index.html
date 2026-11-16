@@ -189,46 +189,64 @@ const stageNames=['الفردة المسطحة','طي الجوانب','إغلا�
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function buildAssembly(){
  if(!geometry||geometry.template!=='tuck')return [];
- const {L,W,H,G}=geometry,faces=[],widths=[L,W,L,W];
- const wallProgress=clamp(fold.walls,0,1);
- // A closed tube is the reference geometry. The four walls fold around
- // consecutive vertical hinges, rather than rotating their flaps in world space.
- let origin=V(-L/2,-H/2,W/2),angle=0;
+ const {L,W,H,G}=geometry,faces=[];
  const face=(points,color)=>faces.push({points,color});
+ const x0=-L/2,x1=L/2,y0=-H/2,y1=H/2,z0=-W/2,z1=W/2;
+ const closed=clamp(fold.walls,0,1);
+ // Construct the fully closed tube using shared, exact corner coordinates.
+ // This prevents gaps caused by accumulated rotation and floating-point drift.
+ if(closed>.999){
+  face([V(x0,y0,z1),V(x1,y0,z1),V(x1,y1,z1),V(x0,y1,z1)],'#dcb17e');
+  face([V(x1,y0,z1),V(x1,y0,z0),V(x1,y1,z0),V(x1,y1,z1)],'#e8c18e');
+  face([V(x1,y0,z0),V(x0,y0,z0),V(x0,y1,z0),V(x1,y1,z0)],'#d3a16e');
+  face([V(x0,y0,z0),V(x0,y0,z1),V(x0,y1,z1),V(x0,y1,z0)],'#eac393');
+  function cap(top,progress){
+   const t=clamp(progress,0,1),theta=t*Math.PI/2;
+   const y=top?y1:y0,sgn=top?1:-1;
+   const inward=V(0,sgn*Math.cos(theta),Math.sin(theta));
+   const fromZ=z0,edgeZ=z0+W*Math.sin(theta);
+   const outerY=y+sgn*W*Math.cos(theta);
+   // Dust flaps are behind the main lid when the lid closes.
+   for(const x of [x0,x1]){
+    const sx=x===x0?1:-1;
+    const endX=x+sx*W*.48*Math.sin(theta);
+    const endY=y+sgn*W*.48*Math.cos(theta);
+    face([V(x,y,z0),V(x,y,z1),V(endX,endY,z1),V(endX,endY,z0)],'#eed0a3');
+   }
+   face([V(x0,y,fromZ),V(x1,y,fromZ),V(x1,outerY,edgeZ),V(x0,outerY,edgeZ)],top?'#f0cc9d':'#e8bb86');
+   // The tongue folds inward at the free edge.
+   const lip=V(0,-sgn*Math.sin(theta),Math.cos(theta));
+   const p=V(x0,outerY,edgeZ),q=V(x1,outerY,edgeZ);
+   face([p,q,add(q,scale(lip,W*.18)),add(p,scale(lip,W*.18))],'#dbac79');
+  }
+  // Bottom lid hinges at the front; top lid hinges at the back.
+  // Main panels cover the complete opening at t=1.
+  function lid(top,progress){
+   const t=clamp(progress,0,1),th=t*Math.PI/2,y=top?y1:y0,sgn=top?1:-1;
+   const near=top?z0:z1,dir=top?1:-1;
+   const end=near+dir*W*Math.sin(th),ey=y+sgn*W*Math.cos(th);
+   for(const x of [x0,x1]){
+    const sx=x===x0?1:-1,ext=x+sx*Math.min(L*.42,W*.48)*Math.sin(th);
+    const yy=y+sgn*Math.min(L*.42,W*.48)*Math.cos(th);
+    face([V(x,y,z0),V(x,y,z1),V(ext,yy,z1),V(ext,yy,z0)],'#e9c99a');
+   }
+   face([V(x0,y,near),V(x1,y,near),V(x1,ey,end),V(x0,ey,end)],top?'#f0cc9d':'#e8bb86');
+   const lipStart=V(x0,ey,end),lipEnd=V(x1,ey,end);
+   const lipDir=V(0,-sgn*Math.sin(th),dir*Math.cos(th));
+   face([lipStart,lipEnd,add(lipEnd,scale(lipDir,W*.17)),add(lipStart,scale(lipDir,W*.17))],'#dbac79');
+  }
+  lid(false,fold.bottom);lid(true,fold.top);
+  return faces;
+ }
+ // During wall folding keep the panels attached to their consecutive hinges.
+ const widths=[L,W,L,W],turn=closed*Math.PI/2;
+ let origin=V(x0,y0,z1),angle=0;
  for(let i=0;i<4;i++){
   const w=widths[i],axis=V(Math.cos(angle),0,-Math.sin(angle));
-  const normal=V(Math.sin(angle),0,Math.cos(angle));
   const a=origin,b=add(a,scale(axis,w)),c=add(b,V(0,H,0)),d=add(a,V(0,H,0));
   face([a,b,c,d],['#dcb17e','#e8c18e','#d3a16e','#eac393'][i]);
-  function hingedFlap(top,depth,progress,main){
-   const p0=top?d:a,p1=top?c:b,sign=top?1:-1;
-   const t=clamp(progress,0,1),theta=t*Math.PI/2;
-   // The face normal always points outside the box. Both top and bottom
-   // flaps therefore move along -normal, irrespective of their vertical sign.
-   const direction=add(V(0,sign*Math.cos(theta),0),scale(normal,-Math.sin(theta)));
-   const p2=add(p1,scale(direction,depth)),p3=add(p0,scale(direction,depth));
-   if(!main){
-    face([p0,p1,add(p2,scale(axis,-w*.12)),add(p3,scale(axis,w*.12))],'#eed0a3');
-    return;
-   }
-   face([p0,p1,p2,p3],top?'#f0cc9d':'#e8bb86');
-   // At full closure the tuck tongue points into the box (down for
-   // the top lid, up for the bottom lid), not back out into the air.
-   const lipDir=add(scale(V(0,1,0),-sign*Math.sin(theta)),scale(normal,-Math.cos(theta)));
-   face([p3,p2,add(p2,scale(lipDir,W*.2)),add(p3,scale(lipDir,W*.2))],'#dbac79');
-  }
-  if(i===0){
-   hingedFlap(false,W,fold.bottom,true);
-   const ga=angle+clamp(fold.glue,0,1)*Math.PI/2;
-   const glueAxis=V(Math.cos(ga),0,-Math.sin(ga));
-   face([add(a,scale(glueAxis,-G)),a,d,add(d,scale(glueAxis,-G))],'#be8955');
-  }
-  if(i===2)hingedFlap(true,W,fold.top,true);
-  if(i===1||i===3){
-   hingedFlap(false,W*.48,fold.bottom,false);
-   hingedFlap(true,W*.48,fold.top,false);
-  }
-  origin=b;angle+=wallProgress*Math.PI/2;
+  if(i===0)face([add(a,V(-G,0,0)),a,d,add(d,V(-G,0,0))],'#be8955');
+  origin=b;angle+=turn;
  }
  return faces;
 }
