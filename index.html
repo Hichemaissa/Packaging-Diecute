@@ -235,7 +235,29 @@ function buildAssembly(){
   const w=widths[i],axis=V(Math.cos(angle),0,-Math.sin(angle));
   const a=origin,b=add(a,scale(axis,w)),c=add(b,V(0,H,0)),d=add(a,V(0,H,0));
   face([a,b,c,d],['#dcb17e','#e8c18e','#d3a16e','#eac393'][i]);
-  if(i===0)face([add(a,V(-G,0,0)),a,d,add(d,V(-G,0,0))],'#be8955');
+  // Keep all four top/bottom flaps attached and visible on the flat blank.
+  // Their hinge axes follow each wall as it folds into the tube.
+  const normal=V(Math.sin(angle),0,Math.cos(angle));
+  const flap=(top,depth,progress,main)=>{
+   const p0=top?d:a,p1=top?c:b,sgn=top?1:-1;
+   const theta=clamp(progress,0,1)*Math.PI/2;
+   const direction=add(V(0,sgn*Math.cos(theta),0),scale(normal,-Math.sin(theta)));
+   const q0=add(p0,scale(direction,depth)),q1=add(p1,scale(direction,depth));
+   face([p0,p1,q1,q0],main?'#edc393':'#e8cfaa');
+   if(main){
+    const tongueDir=add(V(0,sgn*Math.cos(theta),0),scale(normal,-Math.sin(theta)));
+    face([q0,q1,add(q1,scale(tongueDir,W*.17)),add(q0,scale(tongueDir,W*.17))],'#d6a674');
+   }
+  };
+  if(i===0){
+   flap(false,W,fold.bottom,true);
+   face([add(a,scale(axis,-G)),a,d,add(d,scale(axis,-G))],'#be8955');
+  }
+  if(i===2)flap(true,W,fold.top,true);
+  if(i===1||i===3){
+   flap(true,Math.min(L*.42,W*.48),fold.top,false);
+   flap(false,Math.min(L*.42,W*.48),fold.bottom,false);
+  }
   origin=b;angle+=turn;
  }
  return faces;
@@ -295,9 +317,13 @@ function drawAssembly(){
   };
   const {L,W,H}=geometry;
   // Dimension anchors follow the actual box, not the viewport edges.
-  dimension(V(-L/2,-H/2,W/2),V(L/2,-H/2,W/2),'L · Length',L,19);
-  dimension(V(L/2,-H/2,W/2),V(L/2,-H/2,-W/2),'W · Width',W,19);
-  dimension(V(-L/2,-H/2,W/2),V(-L/2,H/2,W/2),'H · Height',H,-20);
+  // On the flat blank, the three axis arrows overlap the panel strip.
+  // Show them on the assembled box; the live size cards stay visible at all stages.
+  if(fold.walls>.999){
+   dimension(V(-L/2,-H/2,W/2),V(L/2,-H/2,W/2),'L · Length',L,27);
+   dimension(V(L/2,-H/2,W/2),V(L/2,-H/2,-W/2),'W · Width',W,27);
+   dimension(V(-L/2,-H/2,W/2),V(-L/2,H/2,W/2),'H · Height',H,-29);
+  }
   dimGroup.replaceChildren(dims);
  }
  $('assemblyLength').textContent=geometry.L+' mm';
