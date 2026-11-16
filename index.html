@@ -279,7 +279,10 @@ function drawAssembly(){
  }
  const projected=buildAssembly().map(f=>({...f,p:f.points.map(cameraPoint)}));
  const all=projected.flatMap(f=>f.p);
- if(!all.length||all.some(p=>p.some(n=>!Number.isFinite(n))))throw Error('Invalid assembly geometry');
+ if(!all.length||all.some(p=>p.some(n=>!Number.isFinite(n)))){
+  console.error('Invalid assembly geometry; keeping previous frame');
+  return;
+ }
  const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
  const zoom=clamp(Number($('assemblyZoom').value)/100,.2,3);
@@ -376,7 +379,11 @@ model.addEventListener('pointerup',()=>state.drag=false);
 model.addEventListener('pointercancel',()=>state.drag=false);
 $('turnLeft').addEventListener('click',()=>{state.yaw-=Math.PI/6;drawAssembly()});
 $('turnRight').addEventListener('click',()=>{state.yaw+=Math.PI/6;drawAssembly()});
+// Start with a recognisable fully assembled carton, not the flat blank.
 fold.walls=1;fold.glue=1;fold.bottom=1;fold.top=1;
+target.walls=1;target.glue=1;target.bottom=1;target.top=1;
+stepInput.value=4;
+state.opened=false;
 setTemplate('tuck');
 renderStage();
 })();
