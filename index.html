@@ -275,8 +275,7 @@ model.addEventListener('pointermove',e=>{if(!dragging)return;yaw+=(e.clientX-px)
 model.addEventListener('pointerup',()=>dragging=false);
 model.addEventListener('pointercancel',()=>dragging=false);
 setTemplate('tuck');
-update3D();
-requestAnimationFrame(loop);
+renderStage();
 })();
 </script>
 </body>
