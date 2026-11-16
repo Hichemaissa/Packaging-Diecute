@@ -168,7 +168,7 @@ $('pdf').addEventListener('click',()=>{update();if(geometry)download(makePdf(geo
 
 const model=$('assemblyModel'),shapes=$('assemblyShapes'),stepInput=$('assemblyStep'),status=$('assemblyStatus');
 let yaw=-.57,pitch=-.34,dragging=false,px=0,py=0,timer=null,opened=false,frame=0;
-const fold={wall:0,top:0,bottom:0},aim={wall:0,top:0,bottom:0};
+const fold={wall:0,glue:0,top:0,bottom:0},aim={wall:0,glue:0,top:0,bottom:0};
 const labels=['فردة العلبة المسطحة','طي الجوانب حول خطوط التخديد','إغلاق اللسان الجانبي','طي القاعدة السفلية','إغلاق الغطاء العلوي'];
 const vec=(x,y,z)=>[x,y,z],sum=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],mul=(a,n)=>a.map(v=>v*n);
 function makeModel(){
@@ -187,7 +187,8 @@ function makeModel(){
    const p=sum(start,mul(outward,depth)),q=sum(end,mul(outward,depth));
    if(main){
     push([start,end,q,p],top?'#f1cb9a':'#e8bc86');
-    const lipDir=sum(vec(0,dir*Math.cos(phi*2),0),mul(n,-Math.sin(phi*2)));
+    const lipAngle=Math.min(1,amount)*Math.PI/2;
+    const lipDir=sum(vec(0,dir*Math.cos(phi+lipAngle),0),mul(n,-Math.sin(phi+lipAngle)));
     push([p,q,sum(q,mul(lipDir,W*.20)),sum(p,mul(lipDir,W*.20))],'#e4b681');
    }else{
     push([start,end,sum(q,mul(u,-width*.14)),sum(p,mul(u,width*.14))],'#efd1a4');
@@ -195,7 +196,7 @@ function makeModel(){
   }
   if(i===0){
    flap(false,W*.78,fold.bottom,true);
-   const glueDir=vec(Math.cos(ang-fold.wall*Math.PI/2),0,-Math.sin(ang-fold.wall*Math.PI/2));
+   const glueDir=vec(Math.cos(ang-fold.glue*Math.PI/2),0,-Math.sin(ang-fold.glue*Math.PI/2));
    push([sum(a,mul(glueDir,-G)),a,d,sum(d,mul(glueDir,-G))],'#c58f58');
   }
   if(i===2)flap(true,W*.78,fold.top,true);
@@ -236,7 +237,7 @@ function drawModel(){
 }
 function renderStage(){
  const n=+stepInput.value;
- aim.wall=n>=1?1:0;aim.bottom=n>=3?1:0;aim.top=n>=4&&!opened?1:0;
+ aim.wall=n>=1?1:0;aim.glue=n>=2?1:0;aim.bottom=n>=3?1:0;aim.top=n>=4&&!opened?1:0;
  status.textContent=n+'/4 — '+labels[n]+(opened?' — الغطاء مفتوح':'')+'؛ اسحب لتدوير العلبة.';
  $('assemblyPlay').textContent=timer?'⏸ إيقاف':'▶ تشغيل التجميع';
  animate();
