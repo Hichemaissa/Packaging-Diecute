@@ -20,7 +20,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 /* Articulated Tuck End: panels linked in dieline order by real 3D hinges */
 /* Canvas-based folding preview: responsive fit on every screen */
 .assembly-view{height:390px;position:relative;background:radial-gradient(circle at 50% 45%,#faffff,#e6edf7);border-radius:12px;overflow:hidden}
-.assembly-canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.assembly-canvas{display:block;position:relative;z-index:1;width:100%;height:100%;touch-action:none;cursor:grab}
 .assembly-canvas:active{cursor:grabbing}
 .assembly-open-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .assembly-open-controls .action{flex:1}
@@ -43,7 +43,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="helper">✓ الأحمر: <b>Cut</b> (قص)<br>✓ الأخضر المتصل: <b>Crease</b> (طي)<br>✓ الـ PDF متجهي بالأبعاد الحقيقية 1:1، وليس مجرد صورة.</div>
 </div></aside>
 <div class="workspace"><section class="panel"><div class="phead toolbar"><div><h3>معاينة المخطط الهندسي</h3><div id="templateDesc" class="small muted" style="margin-top:5px">RSC 0201 · Flat blank</div></div><div class="legend"><span><i class="swatch"></i> Cut</span><span><i class="swatch fold"></i> Crease</span></div></div><div class="canvas"><svg id="preview" aria-label="معاينة خطوط القص والطي" role="img" viewBox="0 0 600 410"></svg></div><div class="stats"><div class="stat"><small>عرض الفردة</small><b id="netW">—</b></div><div class="stat"><small>ارتفاع الفردة</small><b id="netH">—</b></div><div class="stat"><small>مساحة الفردة التقريبية</small><b id="area">—</b></div></div></section>
-<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><canvas class="assembly-canvas" id="assemblyCanvas" aria-label="معاينة ثلاثية الأبعاد للعلبة؛ اسحب لتدويرها"></canvas></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyZoom" class="small">🔎 تكبير</label><input id="assemblyZoom" type="range" min="90" max="170" value="110" step="5" aria-label="تكبير نموذج العلبة"><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="4" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
+<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><svg id="assemblyFallback" viewBox="0 0 360 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="علبة كرتونية ثلاثية الأبعاد" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><g stroke="#956a3e" stroke-width="2" stroke-linejoin="round"><path d="M70 90 L200 45 L297 98 L166 145 Z" fill="#f1cf9f"/><path d="M70 90 L166 145 L166 294 L70 235 Z" fill="#dfb47f"/><path d="M166 145 L297 98 L297 242 L166 294 Z" fill="#c8955c"/><path d="M70 90 L200 45 L297 98 L166 145 Z" fill="#efc997"/></g></svg><canvas class="assembly-canvas" id="assemblyCanvas" aria-label="معاينة ثلاثية الأبعاد للعلبة؛ اسحب لتدويرها"></canvas></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyZoom" class="small">🔎 تكبير</label><input id="assemblyZoom" type="range" min="90" max="170" value="110" step="5" aria-label="تكبير نموذج العلبة"><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="4" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
 <section class="panel" style="margin-top:17px"><div class="phead"><h3>⬇️ تحميل ملفات التصميم</h3><span class="small muted">Vector Files</span></div><div class="pbody"><div class="actions"><button type="button" id="pdf" class="action primary">⬇ تحميل PDF (1:1)</button><button type="button" id="svg" class="action secondary">⬇ تحميل SVG</button></div><p class="small muted" style="line-height:1.8;margin:13px 0 0">PDF قابل للفتح في برامج التصميم والطباعة، وSVG متجهي قابل للتعديل في Illustrator أو Inkscape. عند الطباعة اختر <b>Actual Size / 100%</b> ولا تستعمل Fit to Page.</p></div></section>
 
 </div></div>
@@ -232,7 +232,7 @@ function draw3D(){
    assemblyCanvas.width=Math.round(w*dpr);assemblyCanvas.height=Math.round(h*dpr);
  }
  aCtx.setTransform(dpr,0,0,dpr,0,0);aCtx.clearRect(0,0,w,h);
- const faces=makeFaces();if(!faces.length)return;
+ const faces=makeFaces();if(!faces.length){$('assemblyFallback').style.display='block';return;}
  const maxDim=Math.max(geometry.L,geometry.H,geometry.W),cam=maxDim*5;
  const transformed=faces.map(f=>{
    const pts=f.pts.map(rotatePoint);
@@ -247,6 +247,7 @@ function draw3D(){
  const cx=w/2-(minX+maxX)/2*fit,cy=h/2-(minY+maxY)/2*fit;
  aCtx.fillStyle='#bed0df23';aCtx.beginPath();aCtx.ellipse(w/2,h*.92,w*.27,11,0,0,Math.PI*2);aCtx.fill();
  const fills={wall:'#dbb180',flap:'#ecc797',dust:'#f0d2a9',lip:'#e6ba82',glue:'#c9985e'};
+ $('assemblyFallback').style.display='none';
  for(const f of transformed.sort((a,b)=>a.avg-b.avg)){
    const pts=f.projected;aCtx.beginPath();
    pts.forEach((p,i)=>i?aCtx.lineTo(cx+p.x*fit,cy+p.y*fit):aCtx.moveTo(cx+p.x*fit,cy+p.y*fit));aCtx.closePath();
