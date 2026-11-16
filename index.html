@@ -22,7 +22,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="intro"><div><h2>حوّل المقاسات إلى Diecut جاهز للتصدير</h2><p>أدخل الأبعاد بالميليمتر، شاهد المخطط، وحمّل ملف PDF متجهي بالحجم الحقيقي.</p></div><span class="pill">● يعمل حتى بلا إنترنت</span></div>
 <div class="layout">
 <aside class="panel"><div class="phead"><h3>⚙️ إعدادات العلبة</h3><span class="small muted">الأبعاد mm</span></div><div class="pbody">
-<div class="group"><p class="group-title">نوع العلبة</p><div class="templates"><button id="t-rsc" type="button" class="template active" aria-pressed="true"><span class="ticon">📦</span><span><strong>علبة شحن RSC 0201</strong><small>4 جوانب + لسان لصق + ألسنة الإغلاق</small></span></button><button id="t-tuck" type="button" class="template" aria-pressed="false"><span class="ticon">🎁</span><span><strong>علبة Tuck End حسب مرجع PDF</strong><small>علبة عطر أو منتج مع ألسنة طي وإغلاق</small></span></button></div></div>
+<div class="group"><p class="group-title">نوع العلبة</p><div class="templates"><button id="t-rsc" type="button" class="template" aria-pressed="false"><span class="ticon">📦</span><span><strong>علبة شحن RSC 0201</strong><small>4 جوانب + لسان لصق + ألسنة الإغلاق</small></span></button><button id="t-tuck" type="button" class="template active" aria-pressed="true"><span class="ticon">🎁</span><span><strong>علبة Tuck End حسب مرجع PDF</strong><small>علبة عطر أو منتج مع ألسنة طي وإغلاق</small></span></button></div></div>
 <div class="group"><p class="group-title">المقاسات الداخلية الاسمية</p><div class="fields"><div class="field"><label for="length">الطول (L)</label><div class="input-wrap"><input id="length" type="number" min="10" max="1000" value="160" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="width">العرض (W)</label><div class="input-wrap"><input id="width" type="number" min="10" max="1000" value="100" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="height">الارتفاع (H)</label><div class="input-wrap"><input id="height" type="number" min="10" max="1200" value="220" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="glue">لسان اللصق</label><div class="input-wrap"><input id="glue" type="number" min="6" max="60" value="18" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field full"><label for="slot">فراغ الشقوق بين ألسنة الإغلاق (RSC)</label><div class="input-wrap"><input id="slot" type="number" min="0" max="12" value="3" step="0.5" inputmode="decimal"><span>mm</span></div><div class="field-note">يُطبق على قالب RSC فقط</div></div></div></div>
 <div id="error" class="error" role="alert"></div>
 <div class="group"><button type="button" id="generate" class="action primary" style="width:100%">↻ تحديث المخطط</button></div>
@@ -42,48 +42,53 @@ function S(x1,y1,x2,y2,kind='cut'){return {x1,y1,x2,y2,kind};}
 function create(){
  const L=+$('length').value,W=+$('width').value,H=+$('height').value,G=+$('glue').value,slot=+$('slot').value;
  if(![L,W,H,G,slot].every(Number.isFinite)||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
- const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs.at(-1)+w));
- const lines=[],curves=[],label=[];const add=(x1,y1,x2,y2,kind='cut')=>lines.push(S(x1,y1,x2,y2,kind));
- const path=(p,kind='cut')=>{for(let i=1;i<p.length;i++)add(...p[i-1],...p[i],kind)};
+ const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs[xs.length-1]+w));
+ const lines=[],curves=[],label=[];
+ const add=(x1,y1,x2,y2,kind='cut')=>{if(Math.hypot(x2-x1,y2-y1)>0.00001)lines.push(S(x1,y1,x2,y2,kind));};
+ const path=(p,kind='cut')=>{for(let i=1;i<p.length;i++)add(p[i-1][0],p[i-1][1],p[i][0],p[i][1],kind);};
  const curve=(x1,y1,cx1,cy1,cx2,cy2,x2,y2,kind='cut')=>curves.push({x1,y1,cx1,cy1,cx2,cy2,x2,y2,kind});
- const tuck=template==='tuck',top=tuck?W:W/2,bottom=tuck?W:W/2,bodyY=top,bodyEnd=top+H;
+ const tuck=template==='tuck',top=tuck?W*.98:W/2,bottom=top,bodyY=top,bodyEnd=top+H;
  for(let i=0;i<4;i++)label.push({x:(xs[i]+xs[i+1])/2,y:bodyY+H/2,text:['FRONT','SIDE','BACK','SIDE'][i]});
  for(let i=0;i<4;i++)add(xs[i],bodyY,xs[i],bodyEnd,'crease');
- add(xs[4],bodyY,xs[4],bodyEnd);
- const inset=Math.min(6,H*.12);path([[G,bodyY],[0,bodyY+inset],[0,bodyEnd-inset],[G,bodyEnd]]);
+ add(xs[4],bodyY,xs[4],bodyEnd,'cut');
+ const inset=Math.min(G*.46,H*.09);
+ path([[G,bodyY],[0,bodyY+inset],[0,bodyEnd-inset],[G,bodyEnd]]);
  if(!tuck){
   if(slot>=Math.min(L,W)/3)throw Error('فراغ الشقوق كبير مقارنة بعرض الألواح.');
   for(let i=0;i<4;i++){
-   const x0=xs[i],x1=xs[i+1],left=x0+(i>0?slot/2:0),right=x1-(i<3?slot/2:0),D=W/2;
-   path([[x0,bodyY],[left,bodyY],[left,bodyY-D],[right,bodyY-D],[right,bodyY],[x1,bodyY]]);
-   path([[x0,bodyEnd],[left,bodyEnd],[left,bodyEnd+D],[right,bodyEnd+D],[right,bodyEnd]]);
-   add(x0,bodyY,x1,bodyY,'crease');add(x0,bodyEnd,x1,bodyEnd,'crease');
+   const a=xs[i],b=xs[i+1],left=a+(i>0?slot/2:0),right=b-(i<3?slot/2:0),d=W/2;
+   path([[a,bodyY],[left,bodyY],[left,bodyY-d],[right,bodyY-d],[right,bodyY],[b,bodyY]]);
+   path([[a,bodyEnd],[left,bodyEnd],[left,bodyEnd+d],[right,bodyEnd+d],[right,bodyEnd],[b,bodyEnd]]);
+   add(a,bodyY,b,bodyY,'crease');add(a,bodyEnd,b,bodyEnd,'crease');
   }
  }else{
-  // Reference: main rounded tuck lip on panel 3 at top and panel 1 at bottom.
+  // Proportional recreation of the user's single-page reference silhouette.
+  // This does not substitute for a certified Prinect manufacturing library template.
+  const depth=W*.78,lip=W*.20,dust=W*.48,r=Math.min(W*.20,L*.14),k=.5522847498307936;
   const main=(idx,side)=>{
-   const a=xs[idx],b=xs[idx+1],base=side==='top'?bodyY:bodyEnd,k=side==='top'?-1:1;
-   const lip=W*.20,r=Math.min(lip*.92,L*.13),d=W*.80;
-   add(a,base,a,base+k*d);add(b,base,b,base+k*d);
-   add(a,base+k*d,a,base+k*(d+lip-r));
-   curve(a,base+k*(d+lip-r),a,base+k*(d+lip),a+r*.35,base+k*(d+lip),a+r,base+k*(d+lip));
-   add(a+r,base+k*(d+lip),b-r,base+k*(d+lip));
-   curve(b-r,base+k*(d+lip),b-r*.35,base+k*(d+lip),b,base+k*(d+lip),b,base+k*(d+lip-r));
-   add(b,base+k*(d+lip-r),b,base+k*d);
-   add(a,base+k*d,b,base+k*d,'crease');add(a,base,b,base,'crease');
+   const left=xs[idx],right=xs[idx+1],base=side==='top'?bodyY:bodyEnd;
+   const dir=side==='top'?-1:1,outer=base+dir*(depth+lip),cornerY=outer-dir*r;
+   add(left,base,left,cornerY);
+   curve(left,cornerY,left,outer-dir*r*(1-k),left+r*(1-k),outer,left+r,outer);
+   add(left+r,outer,right-r,outer);
+   curve(right-r,outer,right-r*(1-k),outer,right,outer-dir*r*(1-k),right,cornerY);
+   add(right,cornerY,right,base);
+   add(left,base,right,base,'crease');
+   add(left,base+dir*depth,right,base+dir*depth,'crease');
   };
-  const dust=(idx,side)=>{
-   const a=xs[idx],b=xs[idx+1],base=side==='top'?bodyY:bodyEnd,k=side==='top'?-1:1;
-   const depth=W*.50,bevel=Math.min(W*.14,(b-a)*.18);
-   // The reference has one slanted outer shoulder and one straight inner shoulder.
-   const slantLeft=(side==='top'&&idx===1)||(side==='bottom'&&idx===3);
-   if(slantLeft)path([[a,base],[a+bevel,base+k*depth],[b,base+k*depth],[b,base]]);
-   else path([[a,base],[a,base+k*depth],[b-bevel,base+k*depth],[b,base]]);
-   add(a,base,b,base,'crease');
+  const wing=(idx,side)=>{
+   const left=xs[idx],right=xs[idx+1],base=side==='top'?bodyY:bodyEnd;
+   const dir=side==='top'?-1:1,outer=base+dir*dust,jog=W*.015,bevel=W*.15,step=W*.09;
+   if(side==='top'&&idx===1)path([[left,base],[left+jog,base+dir*step],[left+bevel,outer],[right,outer]]);
+   else if(side==='top')path([[left,outer],[right-bevel,outer],[right-jog,base+dir*step],[right,base]]);
+   else if(idx===1)path([[left,base],[left,outer],[right-bevel,outer],[right-jog,base+dir*step],[right,base]]);
+   else path([[left,base],[left+jog,base+dir*step],[left+bevel,outer],[right,outer],[right,base]]);
+   add(left,base,right,base,'crease');
   };
   main(2,'top');main(0,'bottom');
-  [1,3].forEach(i=>{dust(i,'top');dust(i,'bottom')});
-  add(xs[0],bodyY,xs[1],bodyY);add(xs[2],bodyEnd,xs[3],bodyEnd);
+  wing(1,'top');wing(3,'top');wing(1,'bottom');wing(3,'bottom');
+  add(xs[0],bodyY,xs[1],bodyY);
+  add(xs[2],bodyEnd,xs[3],bodyEnd);
  }
  const maxX=xs[4],maxY=bodyEnd+bottom;
  if(maxX>4900||maxY>4900)throw Error('المخطط كبير على تنسيق PDF الحالي.');
@@ -94,8 +99,8 @@ function makeSvg(g,includeLabels=true){
  let head=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="${fmt(w)}mm" height="${fmt(h)}mm" viewBox="0 0 ${fmt(w)} ${fmt(h)}" role="img" aria-label="Dieline"><title>L'Ouest Packaging - ${g.template.toUpperCase()} - ${g.L} x ${g.W} x ${g.H} mm</title>`;
  let cuts=g.lines.filter(l=>l.kind==='cut'),folds=g.lines.filter(l=>l.kind==='crease');
  const makePath=arr=>arr.map(l=>`M ${fmt(l.x1+pad)} ${fmt(l.y1+pad)} L ${fmt(l.x2+pad)} ${fmt(l.y2+pad)}`).join(' '); const curvePath=(g.curves||[]).filter(c=>c.kind==='cut').map(c=>`M ${fmt(c.x1+pad)} ${fmt(c.y1+pad)} C ${fmt(c.cx1+pad)} ${fmt(c.cy1+pad)} ${fmt(c.cx2+pad)} ${fmt(c.cy2+pad)} ${fmt(c.x2+pad)} ${fmt(c.y2+pad)}`).join(' ');
- head+=`<g id="CUT" inkscape:groupmode="layer" inkscape:label="CUT" fill="none" stroke="#e44e58" stroke-width="0.38" stroke-linejoin="round"><path d="${makePath(cuts)}"/></g>`;
- head+=`<g id="CREASE" inkscape:groupmode="layer" inkscape:label="CREASE" fill="none" stroke="#159b65" stroke-width="0.28" stroke-dasharray="3 2"><path d="${makePath(folds)}"/></g>`;
+ head+=`<g id="CUT" inkscape:groupmode="layer" inkscape:label="CUT" fill="none" stroke="#e44e58" stroke-width="0.38" stroke-linejoin="round"><path d="${makePath(cuts)} ${curvePath}"/></g>`;
+ head+=`<g id="CREASE" inkscape:groupmode="layer" inkscape:label="CREASE" fill="none" stroke="#159b65" stroke-width="0.28"><path d="${makePath(folds)}"/></g>`;
  if(includeLabels){head+=`<g id="LABELS" fill="#63798e" font-family="Arial,sans-serif" font-size="${fmt(Math.max(7,Math.min(11,g.W*.1)))}" text-anchor="middle" opacity=".6">`;
  g.label.forEach(o=>{head+=`<text x="${fmt(o.x+pad)}" y="${fmt(o.y+pad)}">${o.text}</text>`});head+='</g>'}
  return head+'</svg>';
