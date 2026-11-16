@@ -230,7 +230,7 @@ function drawAssembly(){
  const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
  const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
  const zoom=clamp(Number($('assemblyZoom').value)/100,.2,3);
- const fit=Math.min(342/Math.max(1,maxX-minX),310/Math.max(1,maxY-minY))*zoom;
+ const fit=Math.min(342/Math.max(1,maxX-minX),310/Math.max(1,maxY-minY))*Math.min(zoom,1.12);
  const offsetX=210-(minX+maxX)*fit/2,offsetY=195-(minY+maxY)*fit/2;
  projected.sort((a,b)=>a.p.reduce((n,p)=>n+p[2],0)/a.p.length-b.p.reduce((n,p)=>n+p[2],0)/b.p.length);
  const ns='http://www.w3.org/2000/svg',fragment=document.createDocumentFragment();
@@ -289,6 +289,7 @@ model.addEventListener('pointerup',()=>state.drag=false);
 model.addEventListener('pointercancel',()=>state.drag=false);
 $('turnLeft').addEventListener('click',()=>{state.yaw-=Math.PI/6;drawAssembly()});
 $('turnRight').addEventListener('click',()=>{state.yaw+=Math.PI/6;drawAssembly()});
+fold.walls=1;fold.glue=1;fold.bottom=1;fold.top=1;
 setTemplate('tuck');
 renderStage();
 })();
