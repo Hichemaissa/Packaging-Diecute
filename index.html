@@ -16,52 +16,37 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 @media(max-width:900px){.layout{grid-template-columns:1fr}.canvas{min-height:390px}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:520px){header{padding:17px}.header-chip{display:none}main{padding:18px 12px 30px}.intro h2{font-size:21px}.intro{gap:10px}.canvas{min-height:300px;padding:18px 10px}.stat{padding:12px 7px}.stat b{font-size:13px}.stat small{font-size:10px}.pbody{padding:16px}.action{padding:12px 10px}.actions .action{font-size:12px}}
 
 /* Assembly preview is independent of the production dieline. */
-.assembly-view{height:350px;perspective:1050px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,#f5fbff,#e8f1f7)}
+
+/* Articulated Tuck End: panels linked in dieline order by real 3D hinges */
+.assembly-view{height:390px;perspective:1100px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 40%,#fafcff,#e5edf6);border-radius:12px}
 .assembly-scene{position:relative;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-34deg);touch-action:none;cursor:grab}
 .assembly-scene:active{cursor:grabbing}
-.assembly-box{position:absolute;transform-style:preserve-3d;opacity:var(--boxOpacity);transition:opacity .5s}
-.assembly-face{position:absolute;box-sizing:border-box;background:linear-gradient(130deg,#e5bd85,#cf9a5c);border:1.5px solid #956b3b;backface-visibility:visible;transform-style:preserve-3d}
-.assembly-front,.assembly-back{width:var(--aw);height:var(--ah);left:calc(var(--aw) * -.5);top:calc(var(--ah) * -.5)}
-.assembly-front{transform:translateZ(calc(var(--ad) * .5))}
-.assembly-back{transform:translateZ(calc(var(--ad) * -.5)) rotateY(180deg)}
-.assembly-left,.assembly-right{width:var(--ad);height:var(--ah);left:calc(var(--ad) * -.5);top:calc(var(--ah) * -.5)}
-.assembly-left{transform:translateX(calc(var(--aw) * -.5)) rotateY(90deg)}
-.assembly-right{transform:translateX(calc(var(--aw) * .5)) rotateY(90deg)}
-.assembly-top,.assembly-bottom{width:var(--aw);height:var(--ad);left:calc(var(--aw) * -.5);top:calc(var(--ad) * -.5);transition:opacity .5s}
-.assembly-top{transform:translateY(calc(var(--ah) * -.5)) rotateX(90deg);opacity:var(--topOpacity)}
-.assembly-bottom{transform:translateY(calc(var(--ah) * .5)) rotateX(90deg);opacity:var(--bottomOpacity)}
-.assembly-glue{position:absolute;width:10px;height:var(--ah);background:#e8b873;border:1px dashed #925f32;left:calc(var(--aw) * .5 - 10px);top:calc(var(--ah) * -.5);transform:translateZ(calc(var(--ad) * .5 + 1px));opacity:var(--glueOpacity);transition:opacity .8s}
-.assembly-controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-.assembly-controls input{flex:1;min-width:120px;accent-color:#0b5d9b}
-.assembly-controls button{padding:10px 13px}
-.assembly-note{font-size:12px;color:#536d7f;line-height:1.8;margin-top:12px}
-
-/* Manual-style opening of the upper tuck flap */
-.assembly-top{transform-origin:50% 50%;transform:translateY(calc(var(--ah) * -.5)) rotateX(var(--lidAngle,90deg));opacity:1;transition:transform .85s ease}
-.assembly-bottom{opacity:1}
-.assembly-top{backface-visibility:visible}
+.assembly-box{position:absolute;left:calc(var(--aw)*-.5);top:calc(var(--ah)*-.5);width:var(--aw);height:var(--ah);transform-style:preserve-3d;transform:translateZ(calc(var(--ad)*.5)) translateX(var(--netShift,0px)) scale(var(--netScale,1));transition:transform .9s cubic-bezier(.2,.7,.2,1);--wallAngle:90deg;--glueAngle:-90deg;--topAngle:0deg;--bottomAngle:0deg;--topDust:0deg;--bottomDust:0deg;--topLip:0deg;--bottomLip:0deg}
+.fold-wall{position:relative;height:100%;transform-style:preserve-3d}
+.fold-wall.front,.fold-wall.back{width:var(--aw)}
+.fold-wall.side1,.fold-wall.side2{width:var(--ad)}
+.wall-panel{position:absolute;inset:0;box-sizing:border-box;border:1.4px solid #936b42;background:linear-gradient(125deg,#e9c597,#d5a56e);backface-visibility:visible;box-shadow:inset 0 0 15px #fff3;transform:translateZ(.15px)}
+.wall-panel::after{position:absolute;inset:9px;content:"";border:1px solid #c08b5499;pointer-events:none}
+.fold-joint{position:absolute;left:100%;top:0;height:100%;transform-origin:0 50%;transform-style:preserve-3d;transform:rotateY(var(--wallAngle));transition:transform 1s cubic-bezier(.18,.78,.22,1)}
+.front>.fold-joint,.back>.fold-joint{width:var(--ad)}
+.side1>.fold-joint{width:var(--aw)}
+.fold-flap{position:absolute;box-sizing:border-box;left:0;width:100%;background:linear-gradient(130deg,#efca97,#d6a269);border:1.4px solid #956b3b;backface-visibility:visible;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.18,.78,.22,1)}
+.fold-flap.main{height:var(--mainDepth)}
+.fold-flap.dust{height:var(--dustDepth);clip-path:polygon(0 0,100% 0,90% 100%,10% 100%)}
+.fold-flap.top{bottom:100%;transform-origin:50% 100%;transform:rotateX(var(--topAngle))}
+.fold-flap.bottom{top:100%;transform-origin:50% 0;transform:rotateX(var(--bottomAngle))}
+.fold-flap.top.dust{transform:rotateX(var(--topDust))}
+.fold-flap.bottom.dust{transform:rotateX(var(--bottomDust))}
+.tuck-lip{position:absolute;left:0;width:100%;height:var(--lipDepth);box-sizing:border-box;border:1.4px solid #956b3b;background:#e8b982;backface-visibility:visible;transition:transform 1s cubic-bezier(.18,.78,.22,1)}
+.top .tuck-lip{bottom:100%;transform-origin:50% 100%;transform:rotateX(var(--topLip))}
+.bottom .tuck-lip{top:100%;transform-origin:50% 0;transform:rotateX(var(--bottomLip))}
+.glue-tab{position:absolute;left:calc(var(--ag)*-1);top:0;width:var(--ag);height:100%;box-sizing:border-box;border:1px dashed #946a40;background:#e9bc80;transform-origin:100% 50%;transform:rotateY(var(--glueAngle));transition:transform 1s ease}
 .assembly-open-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .assembly-open-controls .action{flex:1}
-
-/* Connected crease-hinge folding model: flaps are children of their wall panels. */
-.assembly-box{--topFold:0deg;--bottomFold:0deg;--dustTop:0deg;--dustBottom:0deg;--lipFold:0deg;opacity:1}
-.assembly-face{overflow:visible}
-.assembly-front,.assembly-back,.assembly-left,.assembly-right{transition:transform 1s cubic-bezier(.2,.7,.2,1)}
-.assembly-front{transform:translateZ(calc(var(--ad) * .5)) rotateX(var(--wallFold,0deg))}
-.assembly-back{transform:translateZ(calc(var(--ad) * -.5)) rotateY(180deg) rotateX(var(--wallFold,0deg))}
-.assembly-left{transform:translateX(calc(var(--aw) * -.5)) rotateY(90deg) rotateX(var(--wallFold,0deg))}
-.assembly-right{transform:translateX(calc(var(--aw) * .5)) rotateY(90deg) rotateX(var(--wallFold,0deg))}
-.hinge{position:absolute;left:0;width:100%;height:0;transform-style:preserve-3d;perspective:none}
-.top-hinge{top:0}
-.bottom-hinge{bottom:0}
-.flap{position:absolute;box-sizing:border-box;left:0;top:0;width:100%;height:var(--ad);background:linear-gradient(125deg,#efcc96,#d6a369);border:1.5px solid #956b3b;backface-visibility:visible;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
-.top-hinge .flap{transform-origin:50% 0;transform:rotateX(var(--topFold))}
-.bottom-hinge .flap{transform-origin:50% 0;transform:rotateX(var(--bottomFold))}
-.assembly-left .flap,.assembly-right .flap{height:calc(var(--aw) * .42)}
-.assembly-left .top-hinge .flap,.assembly-right .top-hinge .flap{transform:rotateX(var(--dustTop))}
-.assembly-left .bottom-hinge .flap,.assembly-right .bottom-hinge .flap{transform:rotateX(var(--dustBottom))}
-.tuck-lip{position:absolute;left:0;top:100%;height:22%;width:100%;background:#e9be83;border:1px solid #956b3b;transform-origin:50% 0;transform:rotateX(var(--lipFold));transition:transform .9s}
-.assembly-glue{transition:opacity .5s}
+.assembly-controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.assembly-controls input{flex:1;min-width:110px;accent-color:#0b5d9b}
+.assembly-controls button{padding:10px 13px}
+.assembly-note{font-size:12px;color:#536d7f;line-height:1.8;margin-top:12px}
 </style>
 </head>
 <body>
@@ -77,12 +62,34 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="helper">✓ الأحمر: <b>Cut</b> (قص)<br>✓ الأخضر المتصل: <b>Crease</b> (طي)<br>✓ الـ PDF متجهي بالأبعاد الحقيقية 1:1، وليس مجرد صورة.</div>
 </div></aside>
 <div class="workspace"><section class="panel"><div class="phead toolbar"><div><h3>معاينة المخطط الهندسي</h3><div id="templateDesc" class="small muted" style="margin-top:5px">RSC 0201 · Flat blank</div></div><div class="legend"><span><i class="swatch"></i> Cut</span><span><i class="swatch fold"></i> Crease</span></div></div><div class="canvas"><svg id="preview" aria-label="معاينة خطوط القص والطي" role="img" viewBox="0 0 600 410"></svg></div><div class="stats"><div class="stat"><small>عرض الفردة</small><b id="netW">—</b></div><div class="stat"><small>ارتفاع الفردة</small><b id="netH">—</b></div><div class="stat"><small>مساحة الفردة التقريبية</small><b id="area">—</b></div></div></section>
-<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><div class="assembly-scene" id="assemblyScene"><div class="assembly-box" id="assemblyBox">
-<div class="assembly-face assembly-front"><div class="hinge top-hinge"><div class="flap main-flap"><div class="tuck-lip"></div></div></div><div class="hinge bottom-hinge"><div class="flap main-flap"></div></div></div>
-<div class="assembly-face assembly-back"><div class="hinge top-hinge"><div class="flap main-flap"><div class="tuck-lip"></div></div></div><div class="hinge bottom-hinge"><div class="flap main-flap"></div></div></div>
-<div class="assembly-face assembly-left"><div class="hinge top-hinge"><div class="flap dust-flap"></div></div><div class="hinge bottom-hinge"><div class="flap dust-flap"></div></div></div>
-<div class="assembly-face assembly-right"><div class="hinge top-hinge"><div class="flap dust-flap"></div></div><div class="hinge bottom-hinge"><div class="flap dust-flap"></div></div></div>
-<div class="assembly-glue"></div></div></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="0" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">محاكاة تفاعلية لألسنة Tuck End حول محاور الطي؛ نموذج تعليمي تقريبي وليس محرك Prinect أو نموذجًا معتمدًا للتصنيع.</p></div></section>
+<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><div class="assembly-scene" id="assemblyScene">
+<div class="assembly-box" id="assemblyBox">
+  <div class="fold-wall front">
+    <div class="wall-panel"></div>
+    <div class="glue-tab"></div>
+    <div class="fold-flap bottom main"><div class="tuck-lip"></div></div>
+    <div class="fold-joint">
+      <div class="fold-wall side1">
+        <div class="wall-panel"></div>
+        <div class="fold-flap top dust"></div>
+        <div class="fold-flap bottom dust"></div>
+        <div class="fold-joint">
+          <div class="fold-wall back">
+            <div class="wall-panel"></div>
+            <div class="fold-flap top main"><div class="tuck-lip"></div></div>
+            <div class="fold-joint">
+              <div class="fold-wall side2">
+                <div class="wall-panel"></div>
+                <div class="fold-flap top dust"></div>
+                <div class="fold-flap bottom dust"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="0" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
 <section class="panel" style="margin-top:17px"><div class="phead"><h3>⬇️ تحميل ملفات التصميم</h3><span class="small muted">Vector Files</span></div><div class="pbody"><div class="actions"><button type="button" id="pdf" class="action primary">⬇ تحميل PDF (1:1)</button><button type="button" id="svg" class="action secondary">⬇ تحميل SVG</button></div><p class="small muted" style="line-height:1.8;margin:13px 0 0">PDF قابل للفتح في برامج التصميم والطباعة، وSVG متجهي قابل للتعديل في Illustrator أو Inkscape. عند الطباعة اختر <b>Actual Size / 100%</b> ولا تستعمل Fit to Page.</p></div></section>
 
 </div></div>
@@ -203,36 +210,58 @@ $('generate').addEventListener('click',update);
 $('svg').addEventListener('click',()=>{update();if(geometry)download(new Blob([makeSvg(geometry,false)],{type:'image/svg+xml;charset=utf-8'}),safeName(geometry)+'.svg')});
 $('pdf').addEventListener('click',()=>{update();if(geometry)download(makePdf(geometry),safeName(geometry)+'.pdf')});
 
+
 const assemblyScene=$('assemblyScene'),assemblyBox=$('assemblyBox'),assemblyStep=$('assemblyStep'),assemblyStatus=$('assemblyStatus');
-let assemblyTimer=null,rotX=-24,rotY=-34,dragging=false,px=0,py=0;
-const assemblyStages=['فردة العلبة قبل التجميع','طي الواجهات لتشكيل جسم العلبة','لصق اللسان الجانبي','طي وإغلاق الألسنة السفلية','طي وإغلاق الألسنة العلوية'];
+let assemblyTimer=null,rotX=-24,rotY=-34,dragging=false,px=0,py=0,lidOpen=false;
+const assemblyStages=['الفردة مسطحة والأجزاء متصلة','طي الجوانب حول خطوط التخديد','تثبيت لسان اللصق','إغلاق الألسنة السفلية','إغلاق الألسنة العلوية'];
 function assemblyRender(){
- const step=+assemblyStep.value;
- const closed=step>=4;
- assemblyBox.style.setProperty('--wallFold','0deg');
- assemblyBox.style.setProperty('--bottomFold',step>=3?'90deg':'0deg');
- assemblyBox.style.setProperty('--dustBottom',step>=3?'90deg':'0deg');
- assemblyBox.style.setProperty('--topFold',closed?'90deg':'0deg');
- assemblyBox.style.setProperty('--dustTop',closed?'90deg':'0deg');
- assemblyBox.style.setProperty('--lipFold',closed?'90deg':'0deg');
- assemblyBox.style.setProperty('--glueOpacity',step===2?'1':'0');
- assemblyStatus.textContent=step+'/4 — '+assemblyStages[step]+'؛ اسحب النموذج لتدويره.';
+ const step=+assemblyStep.value,folded=step>=1;
+ assemblyBox.style.setProperty('--wallAngle',folded?'90deg':'0deg');
+ assemblyBox.style.setProperty('--glueAngle',step>=2?'-90deg':'0deg');
+ assemblyBox.style.setProperty('--bottomAngle',step>=3?'-90deg':'0deg');
+ assemblyBox.style.setProperty('--bottomDust',step>=3?'-90deg':'0deg');
+ assemblyBox.style.setProperty('--topAngle',step>=4?'90deg':'0deg');
+ assemblyBox.style.setProperty('--topDust',step>=4?'90deg':'0deg');
+ assemblyBox.style.setProperty('--topLip',step>=4?'90deg':'0deg');
+ assemblyBox.style.setProperty('--bottomLip',step>=3?'-90deg':'0deg');
+ assemblyBox.style.setProperty('--netScale',folded?'1':'var(--flatScale)');
+ assemblyBox.style.setProperty('--netShift',folded?'0px':'var(--flatShift)');
+ assemblyStatus.textContent=geometry?.template==='rsc'?'محاكاة الطي هذه متاحة حاليًا لعلبة Tuck End فقط.':step+'/4 — '+assemblyStages[step]+'؛ اسحب لتدوير النموذج.';
  $('assemblyPlay').textContent=assemblyTimer?'⏸ إيقاف':'▶ تشغيل التجميع';
 }
-function assemblyStop(){if(assemblyTimer!==null){clearInterval(assemblyTimer);assemblyTimer=null;}assemblyRender();}
+function assemblyStop(){
+ if(assemblyTimer!==null){clearInterval(assemblyTimer);assemblyTimer=null;}
+ assemblyRender();
+}
 $('assemblyPlay').addEventListener('click',()=>{
+ if(geometry?.template==='rsc')return;
  if(assemblyTimer!==null){assemblyStop();return;}
  if(+assemblyStep.value>=4)assemblyStep.value=0;
- assemblyTimer=setInterval(()=>{const n=+assemblyStep.value;if(n>=4){assemblyStop();return;}assemblyStep.value=n+1;assemblyRender();if(n+1===4)assemblyStop();},1400);
+ assemblyTimer=setInterval(()=>{
+  const n=+assemblyStep.value;
+  if(n>=4){assemblyStop();return;}
+  assemblyStep.value=n+1;assemblyRender();
+  if(n+1===4)assemblyStop();
+ },1450);
  assemblyRender();
 });
 $('assemblyReset').addEventListener('click',()=>{assemblyStop();assemblyStep.value=0;assemblyRender();});
 assemblyStep.addEventListener('input',()=>{assemblyStop();assemblyRender();});
 function assemblyDims(g){
- const scale=Math.min(165/g.L,155/g.H,120/g.W,1.5);
- assemblyBox.style.setProperty('--aw',Math.max(30,g.L*scale)+'px');
- assemblyBox.style.setProperty('--ah',Math.max(35,g.H*scale)+'px');
- assemblyBox.style.setProperty('--ad',Math.max(22,g.W*scale)+'px');
+ const scale=Math.min(165/g.L,150/g.H,120/g.W,1.5);
+ const aw=Math.max(30,g.L*scale),ah=Math.max(35,g.H*scale),ad=Math.max(22,g.W*scale);
+ assemblyBox.style.setProperty('--aw',aw+'px');
+ assemblyBox.style.setProperty('--ah',ah+'px');
+ assemblyBox.style.setProperty('--ad',ad+'px');
+ assemblyBox.style.setProperty('--ag',Math.max(5,g.G*scale)+'px');
+ assemblyBox.style.setProperty('--mainDepth',ad*.78+'px');
+ assemblyBox.style.setProperty('--dustDepth',ad*.48+'px');
+ assemblyBox.style.setProperty('--lipDepth',ad*.20+'px');
+ const strip=2*(aw+ad);
+ const flatScale=Math.min(.86,260/strip);
+ assemblyBox.style.setProperty('--flatScale',flatScale.toString());
+ assemblyBox.style.setProperty('--flatShift',(-(aw/2+ad))+'px');
+ assemblyBox.style.display=g.template==='tuck'?'block':'none';
  assemblyRender();
 }
 function assemblyRotate(){assemblyScene.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';}
@@ -240,16 +269,13 @@ assemblyScene.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e
 assemblyScene.addEventListener('pointermove',e=>{if(!dragging)return;rotY+=(e.clientX-px)*.5;rotX-=(e.clientY-py)*.5;px=e.clientX;py=e.clientY;assemblyRotate();});
 assemblyScene.addEventListener('pointerup',()=>dragging=false);
 assemblyScene.addEventListener('pointercancel',()=>dragging=false);
-
-
-// Independent lid controls; preserve the 2D dieline and the existing assembly stages.
-let lidOpen=false;
 function setLid(open){
+ if(geometry?.template==='rsc')return;
  lidOpen=open;assemblyStop();assemblyStep.value=4;assemblyRender();
- assemblyBox.style.setProperty('--topFold',open?'0deg':'90deg');
- assemblyBox.style.setProperty('--dustTop',open?'0deg':'90deg');
- assemblyBox.style.setProperty('--lipFold',open?'0deg':'90deg');
- assemblyStatus.textContent=open?'الغطاء والألسنة العلوية مفتوحة — اسحب لتدوير العلبة.':'العلبة مغلقة — اضغط فتح العلبة.';
+ assemblyBox.style.setProperty('--topAngle',open?'0deg':'90deg');
+ assemblyBox.style.setProperty('--topDust',open?'0deg':'90deg');
+ assemblyBox.style.setProperty('--topLip',open?'0deg':'90deg');
+ assemblyStatus.textContent=open?'الغطاء العلوي مفتوح؛ اسحب لتدوير العلبة.':'الغطاء العلوي مغلق؛ اضغط فتح العلبة.';
 }
 $('openBox').addEventListener('click',()=>setLid(true));
 $('closeBox').addEventListener('click',()=>setLid(false));
