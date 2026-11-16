@@ -46,7 +46,7 @@ function create(){
  const lines=[],curves=[],label=[];const add=(x1,y1,x2,y2,kind='cut')=>lines.push(S(x1,y1,x2,y2,kind));
  const path=(p,kind='cut')=>{for(let i=1;i<p.length;i++)add(...p[i-1],...p[i],kind)};
  const curve=(x1,y1,cx1,cy1,cx2,cy2,x2,y2,kind='cut')=>curves.push({x1,y1,cx1,cy1,cx2,cy2,x2,y2,kind});
- const tuck=template==='tuck',top=tuck?W*.65:W/2,bottom=tuck?W*.65:W/2,bodyY=top,bodyEnd=top+H;
+ const tuck=template==='tuck',top=tuck?W:W/2,bottom=tuck?W:W/2,bodyY=top,bodyEnd=top+H;
  for(let i=0;i<4;i++)label.push({x:(xs[i]+xs[i+1])/2,y:bodyY+H/2,text:['FRONT','SIDE','BACK','SIDE'][i]});
  for(let i=0;i<4;i++)add(xs[i],bodyY,xs[i],bodyEnd,'crease');
  add(xs[4],bodyY,xs[4],bodyEnd);
@@ -63,7 +63,7 @@ function create(){
   // Reference: main rounded tuck lip on panel 3 at top and panel 1 at bottom.
   const main=(idx,side)=>{
    const a=xs[idx],b=xs[idx+1],base=side==='top'?bodyY:bodyEnd,k=side==='top'?-1:1;
-   const shoulder=Math.min(W*.18,L*.16),lip=Math.min(W*.12,14),r=Math.min(lip*.8,12),d=Math.min(W*.52,top-lip);
+   const lip=W*.20,r=Math.min(lip*.92,L*.13),d=W*.80;
    add(a,base,a,base+k*d);add(b,base,b,base+k*d);
    add(a,base+k*d,a,base+k*(d+lip-r));
    curve(a,base+k*(d+lip-r),a,base+k*(d+lip),a+r*.35,base+k*(d+lip),a+r,base+k*(d+lip));
@@ -74,8 +74,11 @@ function create(){
   };
   const dust=(idx,side)=>{
    const a=xs[idx],b=xs[idx+1],base=side==='top'?bodyY:bodyEnd,k=side==='top'?-1:1;
-   const depth=Math.min(W*.36,top*.78),bevel=Math.min(W*.13,14);
-   path([[a,base],[a+bevel*.6,base+k*depth],[b-bevel,base+k*depth],[b,base]]);
+   const depth=W*.50,bevel=Math.min(W*.14,(b-a)*.18);
+   // The reference has one slanted outer shoulder and one straight inner shoulder.
+   const slantLeft=(side==='top'&&idx===1)||(side==='bottom'&&idx===3);
+   if(slantLeft)path([[a,base],[a+bevel,base+k*depth],[b,base+k*depth],[b,base]]);
+   else path([[a,base],[a,base+k*depth],[b-bevel,base+k*depth],[b,base]]);
    add(a,base,b,base,'crease');
   };
   main(2,'top');main(0,'bottom');
