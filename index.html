@@ -27,6 +27,21 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 .assembly-controls input{flex:1;min-width:100px;accent-color:#0b5d9b}
 .assembly-controls button{padding:10px 13px}
 .assembly-note{font-size:12px;color:#536d7f;line-height:1.8;margin-top:12px}
+
+/* Product-grade assembly presentation */
+.assembly-view{height:440px;background:radial-gradient(ellipse at 52% 35%,#fff 0%,#edf3f8 57%,#dbe6ee 100%);border:1px solid #d8e3eb;border-radius:16px;margin:14px 18px 0;box-shadow:inset 0 2px 12px #ffffffaa}
+.assembly-view:before{content:'3D  /  DIMENSIONED PREVIEW';position:absolute;top:17px;left:19px;z-index:1;color:#547083;font-size:10px;font-weight:850;letter-spacing:1.4px;pointer-events:none}
+.assembly-view:after{content:'↔ اسحب لتدوير النموذج';position:absolute;bottom:14px;right:16px;z-index:1;color:#607d8f;background:#ffffffd9;border:1px solid #dce6ed;padding:6px 10px;border-radius:20px;font-size:11px;pointer-events:none}
+.assembly-model{filter:drop-shadow(0 14px 12px #24496820)}
+.assembly-dim-line{stroke:#177e9d;stroke-width:1.15;fill:none;vector-effect:non-scaling-stroke}
+.assembly-dim-guide{stroke:#91b7c4;stroke-width:.9;stroke-dasharray:3 3;fill:none}
+.assembly-dim-label{font-family:system-ui,Arial,sans-serif;font-size:12px;font-weight:800;fill:#125c75;paint-order:stroke;stroke:#f6fafc;stroke-width:5px;stroke-linejoin:round;text-anchor:middle;direction:ltr}
+.assembly-dim-caption{font-size:10px;font-weight:650;fill:#58798a;paint-order:stroke;stroke:#f6fafc;stroke-width:4px;text-anchor:middle}
+.assembly-specs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 18px 0;direction:ltr}
+.assembly-spec{flex:1;min-width:100px;border:1px solid #dbe6ed;border-radius:11px;background:#f8fbfd;padding:10px 12px;text-align:center}
+.assembly-spec small{display:block;color:#6b8190;font-size:10px;letter-spacing:1px;font-weight:750}
+.assembly-spec strong{display:block;color:#153d55;font-size:17px;margin-top:3px;font-variant-numeric:tabular-nums}
+@media(max-width:520px){.assembly-view{height:360px;margin:10px 10px 0}.assembly-specs{margin:10px 10px 0}.assembly-spec{min-width:75px;padding:8px}.assembly-spec strong{font-size:14px}}
 </style>
 </head>
 <body>
@@ -42,7 +57,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="helper">✓ الأحمر: <b>Cut</b> (قص)<br>✓ الأخضر المتصل: <b>Crease</b> (طي)<br>✓ الـ PDF متجهي بالأبعاد الحقيقية 1:1، وليس مجرد صورة.</div>
 </div></aside>
 <div class="workspace"><section class="panel"><div class="phead toolbar"><div><h3>معاينة المخطط الهندسي</h3><div id="templateDesc" class="small muted" style="margin-top:5px">RSC 0201 · Flat blank</div></div><div class="legend"><span><i class="swatch"></i> Cut</span><span><i class="swatch fold"></i> Crease</span></div></div><div class="canvas"><svg id="preview" aria-label="معاينة خطوط القص والطي" role="img" viewBox="0 0 600 410"></svg></div><div class="stats"><div class="stat"><small>عرض الفردة</small><b id="netW">—</b></div><div class="stat"><small>ارتفاع الفردة</small><b id="netH">—</b></div><div class="stat"><small>مساحة الفردة التقريبية</small><b id="area">—</b></div></div></section>
-<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><svg class="assembly-model" id="assemblyModel" viewBox="0 0 420 390" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="علبة Tuck End ثلاثية الأبعاد قابلة للتدوير"><g id="assemblyShapes"><polygon points="80,90 235,55 330,115 175,155" fill="#efc997" stroke="#956b3b" stroke-width="2"/><polygon points="80,90 175,155 175,325 80,255" fill="#e2b67f" stroke="#956b3b" stroke-width="2"/><polygon points="175,155 330,115 330,285 175,325" fill="#c99862" stroke="#956b3b" stroke-width="2"/></g></svg></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-open-controls"><button type="button" id="turnLeft" class="action ghost">↶ تدوير يسار</button><button type="button" id="turnRight" class="action ghost">↷ تدوير يمين</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyZoom" class="small">🔎 تكبير</label><input id="assemblyZoom" type="range" min="90" max="170" value="110" step="5" aria-label="تكبير نموذج العلبة"><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="4" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
+<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><svg class="assembly-model" id="assemblyModel" viewBox="0 0 420 390" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="علبة Tuck End ثلاثية الأبعاد قابلة للتدوير"><g id="assemblyShapes"><polygon points="80,90 235,55 330,115 175,155" fill="#efc997" stroke="#956b3b" stroke-width="2"/><polygon points="80,90 175,155 175,325 80,255" fill="#e2b67f" stroke="#956b3b" stroke-width="2"/><polygon points="175,155 330,115 330,285 175,325" fill="#c99862" stroke="#956b3b" stroke-width="2"/></g><g id="assemblyDimensions" aria-label="الأبعاد الاسمية بالميليمتر"></g></svg></div><div class="assembly-specs" aria-label="مقاسات العلبة"><div class="assembly-spec"><small>L · LENGTH</small><strong id="assemblyLength">160 mm</strong></div><div class="assembly-spec"><small>W · WIDTH</small><strong id="assemblyWidth">100 mm</strong></div><div class="assembly-spec"><small>H · HEIGHT</small><strong id="assemblyHeight">220 mm</strong></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-open-controls"><button type="button" id="turnLeft" class="action ghost">↶ تدوير يسار</button><button type="button" id="turnRight" class="action ghost">↷ تدوير يمين</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyZoom" class="small">🔎 تكبير</label><input id="assemblyZoom" type="range" min="90" max="170" value="110" step="5" aria-label="تكبير نموذج العلبة"><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="4" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
 <section class="panel" style="margin-top:17px"><div class="phead"><h3>⬇️ تحميل ملفات التصميم</h3><span class="small muted">Vector Files</span></div><div class="pbody"><div class="actions"><button type="button" id="pdf" class="action primary">⬇ تحميل PDF (1:1)</button><button type="button" id="svg" class="action secondary">⬇ تحميل SVG</button></div><p class="small muted" style="line-height:1.8;margin:13px 0 0">PDF قابل للفتح في برامج التصميم والطباعة، وSVG متجهي قابل للتعديل في Illustrator أو Inkscape. عند الطباعة اختر <b>Actual Size / 100%</b> ولا تستعمل Fit to Page.</p></div></section>
 
 </div></div>
@@ -250,6 +265,36 @@ function drawAssembly(){
   fragment.appendChild(poly);
  }
  shapes.replaceChildren(fragment);
+ // Project dimension arrows from the same 3D camera as the box geometry.
+ const dimGroup=$('assemblyDimensions');
+ if(dimGroup){
+  const dims=document.createDocumentFragment();
+  const svgEl=(tag,attrs)=>{const el=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));return el};
+  const screen=p=>{const q=cameraPoint(p);return [offsetX+q[0]*fit,offsetY+q[1]*fit]};
+  const dimension=(a,b,caption,value,shift)=>{
+   const A=screen(a),B=screen(b),dx=B[0]-A[0],dy=B[1]-A[1],length=Math.hypot(dx,dy);
+   if(length<12)return;
+   const nx=-dy/length,ny=dx/length,off=shift;
+   const x1=A[0]+nx*off,y1=A[1]+ny*off,x2=B[0]+nx*off,y2=B[1]+ny*off;
+   const guides=[[A[0],A[1],x1+nx*5,y1+ny*5],[B[0],B[1],x2+nx*5,y2+ny*5]];
+   for(const g of guides)dims.appendChild(svgEl('line',{x1:g[0],y1:g[1],x2:g[2],y2:g[3],class:'assembly-dim-guide'}));
+   dims.appendChild(svgEl('line',{x1,y1,x2,y2,class:'assembly-dim-line'}));
+   const tick=(x,y)=>dims.appendChild(svgEl('line',{x1:x-nx*4,y1:y-ny*4,x2:x+nx*4,y2:y+ny*4,class:'assembly-dim-line'}));
+   tick(x1,y1);tick(x2,y2);
+   const midX=(x1+x2)/2+nx*(off>=0?11:-11),midY=(y1+y2)/2+ny*(off>=0?11:-11);
+   const text=svgEl('text',{x:midX,y:midY,class:'assembly-dim-label'});text.textContent=value+' mm';dims.appendChild(text);
+   const sub=svgEl('text',{x:midX,y:midY+13,class:'assembly-dim-caption'});sub.textContent=caption;dims.appendChild(sub);
+  };
+  const {L,W,H}=geometry;
+  // Dimension anchors follow the actual box, not the viewport edges.
+  dimension(V(-L/2,-H/2,W/2),V(L/2,-H/2,W/2),'L · Length',L,19);
+  dimension(V(L/2,-H/2,W/2),V(L/2,-H/2,-W/2),'W · Width',W,19);
+  dimension(V(-L/2,-H/2,W/2),V(-L/2,H/2,W/2),'H · Height',H,-20);
+  dimGroup.replaceChildren(dims);
+ }
+ $('assemblyLength').textContent=geometry.L+' mm';
+ $('assemblyWidth').textContent=geometry.W+' mm';
+ $('assemblyHeight').textContent=geometry.H+' mm';
 }
 function animateAssembly(){
  if(state.raf)return;
