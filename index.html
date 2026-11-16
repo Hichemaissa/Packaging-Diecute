@@ -19,9 +19,9 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 
 /* Articulated Tuck End: panels linked in dieline order by real 3D hinges */
 .assembly-view{height:390px;perspective:1100px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 40%,#fafcff,#e5edf6);border-radius:12px}
-.assembly-scene{position:relative;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-34deg);touch-action:none;cursor:grab}
+.assembly-scene{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-34deg);touch-action:none;cursor:grab}
 .assembly-scene:active{cursor:grabbing}
-.assembly-box{position:absolute;left:calc(var(--aw)*-.5);top:calc(var(--ah)*-.5);width:var(--aw);height:var(--ah);transform-style:preserve-3d;transform:translateZ(calc(var(--ad)*.5)) translateX(var(--netShift,0px)) scale(var(--netScale,1));transition:transform .9s cubic-bezier(.2,.7,.2,1);--wallAngle:90deg;--glueAngle:-90deg;--topAngle:0deg;--bottomAngle:0deg;--topDust:0deg;--bottomDust:0deg;--topLip:0deg;--bottomLip:0deg}
+.assembly-box{position:absolute;left:calc(50% - var(--aw)*.5);top:calc(50% - var(--ah)*.5);width:var(--aw);height:var(--ah);transform-style:preserve-3d;transform:translateZ(calc(var(--ad)*.5)) translateX(var(--netShift,0px)) scale(var(--netScale,1));transition:transform .9s cubic-bezier(.2,.7,.2,1);--wallAngle:90deg;--glueAngle:-90deg;--topAngle:0deg;--bottomAngle:0deg;--topDust:0deg;--bottomDust:0deg;--topLip:0deg;--bottomLip:0deg}
 .fold-wall{position:relative;height:100%;transform-style:preserve-3d}
 .fold-wall.front,.fold-wall.back{width:var(--aw)}
 .fold-wall.side1,.fold-wall.side2{width:var(--ad)}
@@ -89,7 +89,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
       </div>
     </div>
   </div>
-</div></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="0" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
+</div></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="4" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
 <section class="panel" style="margin-top:17px"><div class="phead"><h3>⬇️ تحميل ملفات التصميم</h3><span class="small muted">Vector Files</span></div><div class="pbody"><div class="actions"><button type="button" id="pdf" class="action primary">⬇ تحميل PDF (1:1)</button><button type="button" id="svg" class="action secondary">⬇ تحميل SVG</button></div><p class="small muted" style="line-height:1.8;margin:13px 0 0">PDF قابل للفتح في برامج التصميم والطباعة، وSVG متجهي قابل للتعديل في Illustrator أو Inkscape. عند الطباعة اختر <b>Actual Size / 100%</b> ولا تستعمل Fit to Page.</p></div></section>
 
 </div></div>
@@ -248,7 +248,7 @@ $('assemblyPlay').addEventListener('click',()=>{
 $('assemblyReset').addEventListener('click',()=>{assemblyStop();assemblyStep.value=0;assemblyRender();});
 assemblyStep.addEventListener('input',()=>{assemblyStop();assemblyRender();});
 function assemblyDims(g){
- const scale=Math.min(165/g.L,150/g.H,120/g.W,1.5);
+ const scale=Math.min(230/g.L,245/g.H,155/g.W,2);
  const aw=Math.max(30,g.L*scale),ah=Math.max(35,g.H*scale),ad=Math.max(22,g.W*scale);
  assemblyBox.style.setProperty('--aw',aw+'px');
  assemblyBox.style.setProperty('--ah',ah+'px');
@@ -258,7 +258,7 @@ function assemblyDims(g){
  assemblyBox.style.setProperty('--dustDepth',ad*.48+'px');
  assemblyBox.style.setProperty('--lipDepth',ad*.20+'px');
  const strip=2*(aw+ad);
- const flatScale=Math.min(.86,260/strip);
+ const flatScale=Math.min(1,330/strip);
  assemblyBox.style.setProperty('--flatScale',flatScale.toString());
  assemblyBox.style.setProperty('--flatShift',(-flatScale*(aw/2+ad))+'px');
  assemblyBox.style.display=g.template==='tuck'?'block':'none';
@@ -281,6 +281,8 @@ $('openBox').addEventListener('click',()=>setLid(true));
 $('closeBox').addEventListener('click',()=>setLid(false));
 setTemplate('tuck');
 setLid(false);
+assemblyStep.value=4;
+assemblyRender();
 })();
 </script>
 </body>
