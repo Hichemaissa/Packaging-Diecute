@@ -42,6 +42,26 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 .assembly-top{backface-visibility:visible}
 .assembly-open-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .assembly-open-controls .action{flex:1}
+
+/* Connected crease-hinge folding model: flaps are children of their wall panels. */
+.assembly-box{--topFold:0deg;--bottomFold:0deg;--dustTop:0deg;--dustBottom:0deg;--lipFold:0deg;opacity:1}
+.assembly-face{overflow:visible}
+.assembly-front,.assembly-back,.assembly-left,.assembly-right{transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.assembly-front{transform:translateZ(calc(var(--ad) * .5)) rotateX(var(--wallFold,0deg))}
+.assembly-back{transform:translateZ(calc(var(--ad) * -.5)) rotateY(180deg) rotateX(var(--wallFold,0deg))}
+.assembly-left{transform:translateX(calc(var(--aw) * -.5)) rotateY(90deg) rotateX(var(--wallFold,0deg))}
+.assembly-right{transform:translateX(calc(var(--aw) * .5)) rotateY(90deg) rotateX(var(--wallFold,0deg))}
+.hinge{position:absolute;left:0;width:100%;height:0;transform-style:preserve-3d;perspective:none}
+.top-hinge{top:0}
+.bottom-hinge{bottom:0}
+.flap{position:absolute;box-sizing:border-box;left:0;top:0;width:100%;height:var(--ad);background:linear-gradient(125deg,#efcc96,#d6a369);border:1.5px solid #956b3b;backface-visibility:visible;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.top-hinge .flap{transform-origin:50% 0;transform:rotateX(var(--topFold))}
+.bottom-hinge .flap{transform-origin:50% 0;transform:rotateX(var(--bottomFold))}
+.assembly-left .flap,.assembly-right .flap{height:calc(var(--aw) * .42)}
+.assembly-left .top-hinge .flap,.assembly-right .top-hinge .flap{transform:rotateX(var(--dustTop))}
+.assembly-left .bottom-hinge .flap,.assembly-right .bottom-hinge .flap{transform:rotateX(var(--dustBottom))}
+.tuck-lip{position:absolute;left:0;top:100%;height:22%;width:100%;background:#e9be83;border:1px solid #956b3b;transform-origin:50% 0;transform:rotateX(var(--lipFold));transition:transform .9s}
+.assembly-glue{transition:opacity .5s}
 </style>
 </head>
 <body>
@@ -57,7 +77,12 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="helper">✓ الأحمر: <b>Cut</b> (قص)<br>✓ الأخضر المتصل: <b>Crease</b> (طي)<br>✓ الـ PDF متجهي بالأبعاد الحقيقية 1:1، وليس مجرد صورة.</div>
 </div></aside>
 <div class="workspace"><section class="panel"><div class="phead toolbar"><div><h3>معاينة المخطط الهندسي</h3><div id="templateDesc" class="small muted" style="margin-top:5px">RSC 0201 · Flat blank</div></div><div class="legend"><span><i class="swatch"></i> Cut</span><span><i class="swatch fold"></i> Crease</span></div></div><div class="canvas"><svg id="preview" aria-label="معاينة خطوط القص والطي" role="img" viewBox="0 0 600 410"></svg></div><div class="stats"><div class="stat"><small>عرض الفردة</small><b id="netW">—</b></div><div class="stat"><small>ارتفاع الفردة</small><b id="netH">—</b></div><div class="stat"><small>مساحة الفردة التقريبية</small><b id="area">—</b></div></div></section>
-<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><div class="assembly-scene" id="assemblyScene"><div class="assembly-box" id="assemblyBox"><div class="assembly-face assembly-front"></div><div class="assembly-face assembly-back"></div><div class="assembly-face assembly-left"></div><div class="assembly-face assembly-right"></div><div class="assembly-face assembly-top"></div><div class="assembly-face assembly-bottom"></div><div class="assembly-glue"></div></div></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="0" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة شكلية تعليمية للمراحل؛ لا تحاكي طي الفردة الفعلية هندسيًا ولا تصلح لاعتماد التصنيع.</p></div></section>
+<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><div class="assembly-scene" id="assemblyScene"><div class="assembly-box" id="assemblyBox">
+<div class="assembly-face assembly-front"><div class="hinge top-hinge"><div class="flap main-flap"><div class="tuck-lip"></div></div></div><div class="hinge bottom-hinge"><div class="flap main-flap"></div></div></div>
+<div class="assembly-face assembly-back"><div class="hinge top-hinge"><div class="flap main-flap"><div class="tuck-lip"></div></div></div><div class="hinge bottom-hinge"><div class="flap main-flap"></div></div></div>
+<div class="assembly-face assembly-left"><div class="hinge top-hinge"><div class="flap dust-flap"></div></div><div class="hinge bottom-hinge"><div class="flap dust-flap"></div></div></div>
+<div class="assembly-face assembly-right"><div class="hinge top-hinge"><div class="flap dust-flap"></div></div><div class="hinge bottom-hinge"><div class="flap dust-flap"></div></div></div>
+<div class="assembly-glue"></div></div></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="0" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">محاكاة تفاعلية لألسنة Tuck End حول محاور الطي؛ نموذج تعليمي تقريبي وليس محرك Prinect أو نموذجًا معتمدًا للتصنيع.</p></div></section>
 <section class="panel" style="margin-top:17px"><div class="phead"><h3>⬇️ تحميل ملفات التصميم</h3><span class="small muted">Vector Files</span></div><div class="pbody"><div class="actions"><button type="button" id="pdf" class="action primary">⬇ تحميل PDF (1:1)</button><button type="button" id="svg" class="action secondary">⬇ تحميل SVG</button></div><p class="small muted" style="line-height:1.8;margin:13px 0 0">PDF قابل للفتح في برامج التصميم والطباعة، وSVG متجهي قابل للتعديل في Illustrator أو Inkscape. عند الطباعة اختر <b>Actual Size / 100%</b> ولا تستعمل Fit to Page.</p></div></section>
 <div class="panel guidance"><b>تنبيه إنتاجي مهم:</b> هذا مولّد أولي لأنماط محددة، وليس بديلاً عن ArtiosCAD أو عن اعتماد نموذج تصنيع. الأبعاد اسمية؛ لم تُحتسب تعويضات سماكة الورق، الـ kerf، نوع الكرتون، قواعد التخديد، سماحية الماكينة أو اتجاه الألياف. لازم تجرّب عينة وتراجع خطوط القص والطي مع المطبعة قبل تصنيع القالب. <span id="tuckWarning"></span></div>
 </div></div>
@@ -183,10 +208,14 @@ let assemblyTimer=null,rotX=-24,rotY=-34,dragging=false,px=0,py=0;
 const assemblyStages=['فردة العلبة قبل التجميع','طي الواجهات لتشكيل جسم العلبة','لصق اللسان الجانبي','طي وإغلاق الألسنة السفلية','طي وإغلاق الألسنة العلوية'];
 function assemblyRender(){
  const step=+assemblyStep.value;
- assemblyBox.style.setProperty('--topOpacity',step>=4?'1':'.08');
- assemblyBox.style.setProperty('--bottomOpacity',step>=3?'1':'.08');
- assemblyBox.style.setProperty('--glueOpacity',step===2?'1':'.12');
- assemblyBox.style.setProperty('--boxOpacity',step===0?'.35':'1');
+ const closed=step>=4;
+ assemblyBox.style.setProperty('--wallFold','0deg');
+ assemblyBox.style.setProperty('--bottomFold',step>=3?'90deg':'0deg');
+ assemblyBox.style.setProperty('--dustBottom',step>=3?'90deg':'0deg');
+ assemblyBox.style.setProperty('--topFold',closed?'90deg':'0deg');
+ assemblyBox.style.setProperty('--dustTop',closed?'90deg':'0deg');
+ assemblyBox.style.setProperty('--lipFold',closed?'90deg':'0deg');
+ assemblyBox.style.setProperty('--glueOpacity',step===2?'1':'0');
  assemblyStatus.textContent=step+'/4 — '+assemblyStages[step]+'؛ اسحب النموذج لتدويره.';
  $('assemblyPlay').textContent=assemblyTimer?'⏸ إيقاف':'▶ تشغيل التجميع';
 }
@@ -215,7 +244,13 @@ assemblyScene.addEventListener('pointercancel',()=>dragging=false);
 
 // Independent lid controls; preserve the 2D dieline and the existing assembly stages.
 let lidOpen=false;
-function setLid(open){lidOpen=open;assemblyStop();assemblyStep.value=4;assemblyBox.style.setProperty('--topOpacity','1');assemblyBox.style.setProperty('--bottomOpacity','1');assemblyBox.style.setProperty('--lidAngle',open?'0deg':'90deg');assemblyStatus.textContent=open?'العلبة مفتوحة — يمكنك تدويرها باللمس.':'العلبة مغلقة — اضغط فتح العلبة لفتح الغطاء.';}
+function setLid(open){
+ lidOpen=open;assemblyStop();assemblyStep.value=4;assemblyRender();
+ assemblyBox.style.setProperty('--topFold',open?'0deg':'90deg');
+ assemblyBox.style.setProperty('--dustTop',open?'0deg':'90deg');
+ assemblyBox.style.setProperty('--lipFold',open?'0deg':'90deg');
+ assemblyStatus.textContent=open?'الغطاء والألسنة العلوية مفتوحة — اسحب لتدوير العلبة.':'العلبة مغلقة — اضغط فتح العلبة.';
+}
 $('openBox').addEventListener('click',()=>setLid(true));
 $('closeBox').addEventListener('click',()=>setLid(false));
 setTemplate('tuck');
