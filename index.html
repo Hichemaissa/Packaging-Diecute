@@ -196,11 +196,11 @@ function buildAssembly(){
    face([p3,p2,add(p2,scale(tuckDir,W*.2)),add(p3,scale(tuckDir,W*.2))],'#dbac79');
   }
   if(i===0){
-   hingedFlap(false,W*.78,fold.bottom,true);
+   hingedFlap(false,W*.995,fold.bottom,true);
    const ga=angle-fold.glue*Math.PI/2,glueAxis=V(Math.cos(ga),0,-Math.sin(ga));
    face([add(a,scale(glueAxis,-G)),a,d,add(d,scale(glueAxis,-G))],'#be8955');
   }
-  if(i===2)hingedFlap(true,W*.78,fold.top,true);
+  if(i===2)hingedFlap(true,W*.995,fold.top,true);
   if(i===1||i===3){
    hingedFlap(false,W*.48,fold.bottom,false);
    hingedFlap(true,W*.48,fold.top,false);
