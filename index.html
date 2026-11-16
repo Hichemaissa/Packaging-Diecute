@@ -123,7 +123,7 @@ function setTemplate(t){template=t;for(let k of ['rsc','tuck']){$('t-'+k).classL
  $('templateDesc').textContent=t==='rsc'?'RSC 0201 · Regular Slotted Container':'Tuck End · Reference dieline · Fix 05';
  $('tuckWarning').textContent=t==='tuck'?' تم إصلاح عرض الألسنة العلوية والسفلية في المعاينة. المطابقة الإنتاجية النهائية تحتاج فحص عينة.':'';
  update();}
-function update(){try{geometry=create();assemblyDims(geometry);$('error').style.display='none';$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';}
+function update(){try{geometry=create();$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('error').style.display='none';$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';try{assemblyDims(geometry)}catch(err){console.error('3D preview failed:',err);$('assemblyStatus').textContent='تعذر عرض 3D؛ مخطط 2D متاح';}}
 catch(e){geometry=null;$('error').textContent=e.message;$('error').style.display='block';$('netW').textContent=$('netH').textContent=$('area').textContent='—';}}
 function download(blob,filename){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
 const mm2pt=n=>n*72/25.4;
@@ -181,7 +181,7 @@ function makeModel(){
   const a=pos,b=sum(pos,mul(u,width)),c=sum(b,vec(0,H,0)),d=sum(pos,vec(0,H,0));
   push([a,b,c,d],['#dfb37e','#e7c08b','#d1a06b','#e9bf8b'][i]);
   function flap(top,depth,amount,main){
-   const start=top?a:d,end=top?b:c,dir=top?-1:1;
+   const start=top?d:a,end=top?c:b,dir=top?1:-1;
    const phi=amount*Math.PI/2;
    const outward=sum(vec(0,dir*Math.cos(phi),0),mul(n,-Math.sin(phi)));
    const p=sum(start,mul(outward,depth)),q=sum(end,mul(outward,depth));
