@@ -166,118 +166,130 @@ $('pdf').addEventListener('click',()=>{update();if(geometry)download(makePdf(geo
 
 
 
+
 const model=$('assemblyModel'),shapes=$('assemblyShapes'),stepInput=$('assemblyStep'),status=$('assemblyStatus');
-let yaw=-.57,pitch=-.34,dragging=false,px=0,py=0,timer=null,opened=false,frame=0;
-const fold={wall:0,glue:0,top:0,bottom:0},aim={wall:0,glue:0,top:0,bottom:0};
-const labels=['فردة العلبة المسطحة','طي الجوانب حول خطوط التخديد','إغلاق اللسان الجانبي','طي القاعدة السفلية','إغلاق الغطاء العلوي'];
-const vec=(x,y,z)=>[x,y,z],sum=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],mul=(a,n)=>a.map(v=>v*n);
-function makeModel(){
+const V=(x,y,z)=>[x,y,z],add=(a,b)=>a.map((v,i)=>v+b[i]),scale=(a,t)=>a.map(v=>v*t);
+const state={yaw:-.62,pitch:-.38,drag:false,x:0,y:0,raf:0,playing:null,opened:false};
+const fold={walls:0,glue:0,bottom:0,top:0},target={...fold};
+const stageNames=['الفردة المسطحة','طي الجوانب','إغلاق لسان اللصق','طي القاعدة','إغلاق الغطاء'];
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+function buildAssembly(){
  if(!geometry||geometry.template!=='tuck')return [];
- const {L,W,H,G}=geometry,faces=[],theta=fold.wall*Math.PI/2,ws=[L,W,L,W];
- let pos=vec(-L/2,-H/2,W/2),ang=0;
- const push=(points,color)=>faces.push({points,color});
+ const {L,W,H,G}=geometry,faces=[],widths=[L,W,L,W],turn=fold.walls*Math.PI/2;
+ let origin=V(-L/2,-H/2,W/2),angle=0;
+ const face=(points,color)=>faces.push({points,color});
  for(let i=0;i<4;i++){
-  const width=ws[i],u=vec(Math.cos(ang),0,-Math.sin(ang)),n=vec(Math.sin(ang),0,Math.cos(ang));
-  const a=pos,b=sum(pos,mul(u,width)),c=sum(b,vec(0,H,0)),d=sum(pos,vec(0,H,0));
-  push([a,b,c,d],['#dfb37e','#e7c08b','#d1a06b','#e9bf8b'][i]);
-  function flap(top,depth,amount,main){
-   const start=top?d:a,end=top?c:b,dir=top?1:-1;
-   const phi=amount*Math.PI/2;
-   const outward=sum(vec(0,dir*Math.cos(phi),0),mul(n,-Math.sin(phi)));
-   const p=sum(start,mul(outward,depth)),q=sum(end,mul(outward,depth));
-   if(main){
-    push([start,end,q,p],top?'#f1cb9a':'#e8bc86');
-    const lipAngle=Math.min(1,amount)*Math.PI/2;
-    const lipDir=sum(vec(0,dir*Math.cos(phi+lipAngle),0),mul(n,-Math.sin(phi+lipAngle)));
-    push([p,q,sum(q,mul(lipDir,W*.20)),sum(p,mul(lipDir,W*.20))],'#e4b681');
-   }else{
-    push([start,end,sum(q,mul(u,-width*.14)),sum(p,mul(u,width*.14))],'#efd1a4');
+  const w=widths[i],axis=V(Math.cos(angle),0,-Math.sin(angle)),normal=V(Math.sin(angle),0,Math.cos(angle));
+  const a=origin,b=add(a,scale(axis,w)),c=add(b,V(0,H,0)),d=add(a,V(0,H,0));
+  face([a,b,c,d],['#dcb17e','#e8c18e','#d3a16e','#eac393'][i]);
+  function hingedFlap(top,depth,progress,main){
+   const p0=top?d:a,p1=top?c:b,sign=top?1:-1;
+   const angle=clamp(progress,0,1)*Math.PI/2;
+   const direction=add(V(0,sign*Math.cos(angle),0),scale(normal,-Math.sin(angle)));
+   const p2=add(p1,scale(direction,depth)),p3=add(p0,scale(direction,depth));
+   if(!main){
+    face([p0,p1,add(p2,scale(axis,-w*.12)),add(p3,scale(axis,w*.12))],'#eed0a3');
+    return;
    }
+   face([p0,p1,p2,p3],top?'#f0cc9d':'#e8bb86');
+   const tuckAngle=angle+clamp(progress,0,1)*Math.PI/2;
+   const tuckDir=add(V(0,sign*Math.cos(tuckAngle),0),scale(normal,-Math.sin(tuckAngle)));
+   face([p3,p2,add(p2,scale(tuckDir,W*.2)),add(p3,scale(tuckDir,W*.2))],'#dbac79');
   }
   if(i===0){
-   flap(false,W*.78,fold.bottom,true);
-   const glueDir=vec(Math.cos(ang-fold.glue*Math.PI/2),0,-Math.sin(ang-fold.glue*Math.PI/2));
-   push([sum(a,mul(glueDir,-G)),a,d,sum(d,mul(glueDir,-G))],'#c58f58');
+   hingedFlap(false,W*.78,fold.bottom,true);
+   const ga=angle-fold.glue*Math.PI/2,glueAxis=V(Math.cos(ga),0,-Math.sin(ga));
+   face([add(a,scale(glueAxis,-G)),a,d,add(d,scale(glueAxis,-G))],'#be8955');
   }
-  if(i===2)flap(true,W*.78,fold.top,true);
-  if(i===1||i===3){flap(true,W*.48,fold.top,false);flap(false,W*.48,fold.bottom,false);}
-  pos=b;ang+=theta;
+  if(i===2)hingedFlap(true,W*.78,fold.top,true);
+  if(i===1||i===3){
+   hingedFlap(false,W*.48,fold.bottom,false);
+   hingedFlap(true,W*.48,fold.top,false);
+  }
+  origin=b;angle+=turn;
  }
  return faces;
 }
-function project(p){
- const cy=Math.cos(yaw),sy=Math.sin(yaw),cx=Math.cos(pitch),sx=Math.sin(pitch);
+function cameraPoint(p){
+ const cy=Math.cos(state.yaw),sy=Math.sin(state.yaw),cp=Math.cos(state.pitch),sp=Math.sin(state.pitch);
  const x=p[0]*cy+p[2]*sy,z=-p[0]*sy+p[2]*cy;
- const y=p[1]*cx-z*sx,zz=p[1]*sx+z*cx;
- const cam=Math.max(geometry.L,geometry.W,geometry.H)*8;
- const factor=cam/(cam-zz);
- return [x*factor,y*factor,zz];
+ const y=p[1]*cp-z*sp,depth=p[1]*sp+z*cp;
+ const distance=Math.max(geometry.L,geometry.W,geometry.H)*9;
+ const perspective=distance/(distance-depth);
+ return [x*perspective,y*perspective,depth];
 }
-function drawModel(){
+function drawAssembly(){
  if(!geometry||geometry.template!=='tuck'){
-  shapes.innerHTML='<text x="210" y="195" text-anchor="middle" fill="#536d7f" font-size="15">3D: Tuck End فقط</text>';
-  return;
+  shapes.textContent='';
+  const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x','210');t.setAttribute('y','195');t.setAttribute('text-anchor','middle');
+  t.textContent='3D: Tuck End فقط';shapes.appendChild(t);return;
  }
- const faces=makeModel(),proj=faces.map(f=>({...f,p:f.points.map(project)}));
- const all=proj.flatMap(f=>f.p),xmin=Math.min(...all.map(p=>p[0])),xmax=Math.max(...all.map(p=>p[0])),
- ymin=Math.min(...all.map(p=>p[1])),ymax=Math.max(...all.map(p=>p[1]));
- if(!all.length||all.some(p=>p.some(v=>!Number.isFinite(v))))throw new Error('Invalid 3D geometry');
- const zoom=+$('assemblyZoom').value/100;
- const fit=Math.min(342/Math.max(1,xmax-xmin),310/Math.max(1,ymax-ymin))*zoom;
- const ox=210-(xmin+xmax)*fit/2,oy=195-(ymin+ymax)*fit/2;
- proj.sort((a,b)=>a.p.reduce((t,p)=>t+p[2],0)/a.p.length-b.p.reduce((t,p)=>t+p[2],0)/b.p.length);
- const ns='http://www.w3.org/2000/svg';
- shapes.replaceChildren();
- for(const f of proj){
-  const el=document.createElementNS(ns,'polygon');
-  el.setAttribute('points',f.p.map(p=>(ox+p[0]*fit).toFixed(1)+','+(oy+p[1]*fit).toFixed(1)).join(' '));
-  el.setAttribute('fill',f.color);el.setAttribute('stroke','#91673d');el.setAttribute('stroke-width','1.6');
-  el.setAttribute('stroke-linejoin','round');shapes.appendChild(el);
+ const projected=buildAssembly().map(f=>({...f,p:f.points.map(cameraPoint)}));
+ const all=projected.flatMap(f=>f.p);
+ if(!all.length||all.some(p=>p.some(n=>!Number.isFinite(n))))throw Error('Invalid assembly geometry');
+ const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);
+ const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+ const zoom=clamp(Number($('assemblyZoom').value)/100,.2,3);
+ const fit=Math.min(342/Math.max(1,maxX-minX),310/Math.max(1,maxY-minY))*zoom;
+ const offsetX=210-(minX+maxX)*fit/2,offsetY=195-(minY+maxY)*fit/2;
+ projected.sort((a,b)=>a.p.reduce((n,p)=>n+p[2],0)/a.p.length-b.p.reduce((n,p)=>n+p[2],0)/b.p.length);
+ const ns='http://www.w3.org/2000/svg',fragment=document.createDocumentFragment();
+ for(const f of projected){
+  const poly=document.createElementNS(ns,'polygon');
+  poly.setAttribute('points',f.p.map(p=>(offsetX+p[0]*fit).toFixed(2)+','+(offsetY+p[1]*fit).toFixed(2)).join(' '));
+  poly.setAttribute('fill',f.color);poly.setAttribute('stroke','#91673d');
+  poly.setAttribute('stroke-width','1.4');poly.setAttribute('stroke-linejoin','round');
+  fragment.appendChild(poly);
  }
+ shapes.replaceChildren(fragment);
+}
+function animateAssembly(){
+ if(state.raf)return;
+ const tick=()=>{
+  let active=false;
+  for(const k of Object.keys(fold)){
+   const diff=target[k]-fold[k];
+   if(Math.abs(diff)>.0005){fold[k]+=diff*.2;active=true;}else fold[k]=target[k];
+  }
+  try{drawAssembly()}catch(err){console.error('Assembly render:',err);status.textContent='تعذر رسم المحاكاة ثلاثية الأبعاد';state.raf=0;return}
+  if(active)state.raf=requestAnimationFrame(tick);else state.raf=0;
+ };
+ state.raf=requestAnimationFrame(tick);
 }
 function renderStage(){
- const n=+stepInput.value;
- aim.wall=n>=1?1:0;aim.glue=n>=2?1:0;aim.bottom=n>=3?1:0;aim.top=n>=4&&!opened?1:0;
- status.textContent=n+'/4 — '+labels[n]+(opened?' — الغطاء مفتوح':'')+'؛ اسحب لتدوير العلبة.';
- $('assemblyPlay').textContent=timer?'⏸ إيقاف':'▶ تشغيل التجميع';
- animate();
+ const step=clamp(Number(stepInput.value)||0,0,4);
+ target.walls=step>=1?1:0;target.glue=step>=2?1:0;
+ target.bottom=step>=3?1:0;target.top=step>=4&&!state.opened?1:0;
+ status.textContent=step+'/4 — '+stageNames[step]+(state.opened?' — الغطاء مفتوح':'')+'؛ اسحب لتدوير العلبة.';
+ $('assemblyPlay').textContent=state.playing!==null?'⏸ إيقاف':'▶ تشغيل التجميع';
+ animateAssembly();
 }
-function animate(){
- if(frame)return;
- const tick=()=>{
-  let moving=false;
-  for(const k of Object.keys(fold)){
-   const diff=aim[k]-fold[k];
-   if(Math.abs(diff)>.001){fold[k]+=diff*.22;moving=true;}else fold[k]=aim[k];
-  }
-  drawModel();
-  if(moving)frame=requestAnimationFrame(tick);else frame=0;
- };
- frame=requestAnimationFrame(tick);
-}
-function stop(){if(timer!==null){clearInterval(timer);timer=null;}renderStage();}
+function stopPlayback(){if(state.playing!==null){clearInterval(state.playing);state.playing=null;}}
 function assemblyDims(){renderStage();}
-$('assemblyZoom').addEventListener('input',drawModel);
-stepInput.addEventListener('input',()=>{opened=false;stop();});
-$('assemblyReset').addEventListener('click',()=>{if(timer!==null){clearInterval(timer);timer=null;}opened=false;stepInput.value=0;yaw=-.57;pitch=-.34;renderStage();});
-$('openBox').addEventListener('click',()=>{if(timer!==null){clearInterval(timer);timer=null;}stepInput.value=4;opened=true;renderStage();});
-$('closeBox').addEventListener('click',()=>{if(timer!==null){clearInterval(timer);timer=null;}stepInput.value=4;opened=false;renderStage();});
+$('assemblyZoom').addEventListener('input',()=>{try{drawAssembly()}catch(e){console.error(e)}});
+stepInput.addEventListener('input',()=>{stopPlayback();state.opened=false;renderStage()});
+$('assemblyReset').addEventListener('click',()=>{stopPlayback();state.opened=false;stepInput.value=0;state.yaw=-.62;state.pitch=-.38;renderStage()});
+$('openBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=true;renderStage()});
+$('closeBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=false;renderStage()});
 $('assemblyPlay').addEventListener('click',()=>{
  if(geometry?.template!=='tuck')return;
- if(timer!==null){stop();return;}
- if(+stepInput.value>=4)stepInput.value=0;
- opened=false;renderStage();
- timer=setInterval(()=>{
-  const n=+stepInput.value;if(n>=4){stop();return;}
-  stepInput.value=n+1;renderStage();if(n+1===4)stop();
- },1500);renderStage();
+ if(state.playing!==null){stopPlayback();renderStage();return}
+ if(Number(stepInput.value)>=4)stepInput.value=0;
+ state.opened=false;renderStage();
+ state.playing=setInterval(()=>{
+  const next=Number(stepInput.value)+1;
+  if(next>=4){stepInput.value=4;stopPlayback();renderStage();return}
+  stepInput.value=next;renderStage();
+ },1500);
+ renderStage();
 });
-model.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;try{model.setPointerCapture(e.pointerId);}catch(_){}});
-model.addEventListener('pointermove',e=>{if(!dragging)return;yaw+=(e.clientX-px)*.009;pitch=Math.max(-1.4,Math.min(1.4,pitch+(e.clientY-py)*.009));px=e.clientX;py=e.clientY;drawModel();});
-model.addEventListener('pointerup',()=>dragging=false);
-model.addEventListener('pointercancel',()=>dragging=false);
-$('turnLeft').addEventListener('click',()=>{yaw-=Math.PI/6;drawModel();});
-$('turnRight').addEventListener('click',()=>{yaw+=Math.PI/6;drawModel();});
+model.addEventListener('pointerdown',e=>{state.drag=true;state.x=e.clientX;state.y=e.clientY;try{model.setPointerCapture(e.pointerId)}catch(_){}});
+model.addEventListener('pointermove',e=>{if(!state.drag)return;state.yaw+=(e.clientX-state.x)*.009;state.pitch=clamp(state.pitch+(e.clientY-state.y)*.009,-1.4,1.4);state.x=e.clientX;state.y=e.clientY;try{drawAssembly()}catch(err){console.error(err)}});
+model.addEventListener('pointerup',()=>state.drag=false);
+model.addEventListener('pointercancel',()=>state.drag=false);
+$('turnLeft').addEventListener('click',()=>{state.yaw-=Math.PI/6;drawAssembly()});
+$('turnRight').addEventListener('click',()=>{state.yaw+=Math.PI/6;drawAssembly()});
 setTemplate('tuck');
 renderStage();
 })();
