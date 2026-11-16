@@ -260,7 +260,7 @@ function assemblyDims(g){
  const strip=2*(aw+ad);
  const flatScale=Math.min(.86,260/strip);
  assemblyBox.style.setProperty('--flatScale',flatScale.toString());
- assemblyBox.style.setProperty('--flatShift',(-(aw/2+ad))+'px');
+ assemblyBox.style.setProperty('--flatShift',(-flatScale*(aw/2+ad))+'px');
  assemblyBox.style.display=g.template==='tuck'?'block':'none';
  assemblyRender();
 }
