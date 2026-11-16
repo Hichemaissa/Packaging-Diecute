@@ -174,30 +174,38 @@ const stageNames=['الفردة المسطحة','طي الجوانب','إغلا�
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function buildAssembly(){
  if(!geometry||geometry.template!=='tuck')return [];
- const {L,W,H,G}=geometry,faces=[],widths=[L,W,L,W],turn=fold.walls*Math.PI/2;
+ const {L,W,H,G}=geometry,faces=[],widths=[L,W,L,W];
+ const wallProgress=clamp(fold.walls,0,1);
+ // A closed tube is the reference geometry. The four walls fold around
+ // consecutive vertical hinges, rather than rotating their flaps in world space.
  let origin=V(-L/2,-H/2,W/2),angle=0;
  const face=(points,color)=>faces.push({points,color});
  for(let i=0;i<4;i++){
-  const w=widths[i],axis=V(Math.cos(angle),0,-Math.sin(angle)),normal=V(Math.sin(angle),0,Math.cos(angle));
+  const w=widths[i],axis=V(Math.cos(angle),0,-Math.sin(angle));
+  const normal=V(Math.sin(angle),0,Math.cos(angle));
   const a=origin,b=add(a,scale(axis,w)),c=add(b,V(0,H,0)),d=add(a,V(0,H,0));
   face([a,b,c,d],['#dcb17e','#e8c18e','#d3a16e','#eac393'][i]);
   function hingedFlap(top,depth,progress,main){
    const p0=top?d:a,p1=top?c:b,sign=top?1:-1;
-   const angle=clamp(progress,0,1)*Math.PI/2;
-   const direction=add(V(0,sign*Math.cos(angle),0),scale(normal,-Math.sin(angle)));
+   const t=clamp(progress,0,1),theta=t*Math.PI/2;
+   // The face normal always points outside the box. Both top and bottom
+   // flaps therefore move along -normal, irrespective of their vertical sign.
+   const direction=add(V(0,sign*Math.cos(theta),0),scale(normal,-Math.sin(theta)));
    const p2=add(p1,scale(direction,depth)),p3=add(p0,scale(direction,depth));
    if(!main){
     face([p0,p1,add(p2,scale(axis,-w*.12)),add(p3,scale(axis,w*.12))],'#eed0a3');
     return;
    }
    face([p0,p1,p2,p3],top?'#f0cc9d':'#e8bb86');
-   const tuckAngle=angle+clamp(progress,0,1)*Math.PI/2;
-   const tuckDir=add(V(0,sign*Math.cos(tuckAngle),0),scale(normal,-Math.sin(tuckAngle)));
-   face([p3,p2,add(p2,scale(tuckDir,W*.2)),add(p3,scale(tuckDir,W*.2))],'#dbac79');
+   // At full closure the tuck tongue points into the box (down for
+   // the top lid, up for the bottom lid), not back out into the air.
+   const lipDir=add(scale(V(0,1,0),-sign*Math.sin(theta)),scale(normal,-Math.cos(theta)));
+   face([p3,p2,add(p2,scale(lipDir,W*.2)),add(p3,scale(lipDir,W*.2))],'#dbac79');
   }
   if(i===0){
    hingedFlap(false,W,fold.bottom,true);
-   const ga=angle-fold.glue*Math.PI/2,glueAxis=V(Math.cos(ga),0,-Math.sin(ga));
+   const ga=angle+clamp(fold.glue,0,1)*Math.PI/2;
+   const glueAxis=V(Math.cos(ga),0,-Math.sin(ga));
    face([add(a,scale(glueAxis,-G)),a,d,add(d,scale(glueAxis,-G))],'#be8955');
   }
   if(i===2)hingedFlap(true,W,fold.top,true);
@@ -205,7 +213,7 @@ function buildAssembly(){
    hingedFlap(false,W*.48,fold.bottom,false);
    hingedFlap(true,W*.48,fold.top,false);
   }
-  origin=b;angle+=turn;
+  origin=b;angle+=wallProgress*Math.PI/2;
  }
  return faces;
 }
