@@ -168,7 +168,7 @@ $('pdf').addEventListener('click',()=>{update();if(geometry)download(makePdf(geo
 
 const model=$('assemblyModel'),shapes=$('assemblyShapes'),stepInput=$('assemblyStep'),status=$('assemblyStatus');
 let yaw=-.57,pitch=-.34,dragging=false,px=0,py=0,timer=null,opened=false,frame=0;
-const fold={wall:1,top:1,bottom:1},aim={wall:1,top:1,bottom:1};
+const fold={wall:0,top:0,bottom:0},aim={wall:0,top:0,bottom:0};
 const labels=['فردة العلبة المسطحة','طي الجوانب حول خطوط التخديد','إغلاق اللسان الجانبي','طي القاعدة السفلية','إغلاق الغطاء العلوي'];
 const vec=(x,y,z)=>[x,y,z],sum=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],mul=(a,n)=>a.map(v=>v*n);
 function makeModel(){
@@ -208,7 +208,7 @@ function project(p){
  const cy=Math.cos(yaw),sy=Math.sin(yaw),cx=Math.cos(pitch),sx=Math.sin(pitch);
  const x=p[0]*cy+p[2]*sy,z=-p[0]*sy+p[2]*cy;
  const y=p[1]*cx-z*sx,zz=p[1]*sx+z*cx;
- const cam=Math.max(geometry.L,geometry.W,geometry.H)*6;
+ const cam=Math.max(geometry.L,geometry.W,geometry.H)*8;
  const factor=cam/(cam-zz);
  return [x*factor,y*factor,zz];
 }
@@ -220,6 +220,7 @@ function drawModel(){
  const faces=makeModel(),proj=faces.map(f=>({...f,p:f.points.map(project)}));
  const all=proj.flatMap(f=>f.p),xmin=Math.min(...all.map(p=>p[0])),xmax=Math.max(...all.map(p=>p[0])),
  ymin=Math.min(...all.map(p=>p[1])),ymax=Math.max(...all.map(p=>p[1]));
+ if(!all.length||all.some(p=>p.some(v=>!Number.isFinite(v))))throw new Error('Invalid 3D geometry');
  const zoom=+$('assemblyZoom').value/100;
  const fit=Math.min(342/Math.max(1,xmax-xmin),310/Math.max(1,ymax-ymin))*zoom;
  const ox=210-(xmin+xmax)*fit/2,oy=195-(ymin+ymax)*fit/2;
@@ -257,9 +258,9 @@ function stop(){if(timer!==null){clearInterval(timer);timer=null;}renderStage();
 function assemblyDims(){renderStage();}
 $('assemblyZoom').addEventListener('input',drawModel);
 stepInput.addEventListener('input',()=>{opened=false;stop();});
-$('assemblyReset').addEventListener('click',()=>{stop();opened=false;stepInput.value=0;yaw=-.57;pitch=-.34;renderStage();});
-$('openBox').addEventListener('click',()=>{stop();stepInput.value=4;opened=true;renderStage();});
-$('closeBox').addEventListener('click',()=>{stop();stepInput.value=4;opened=false;renderStage();});
+$('assemblyReset').addEventListener('click',()=>{if(timer!==null){clearInterval(timer);timer=null;}opened=false;stepInput.value=0;yaw=-.57;pitch=-.34;renderStage();});
+$('openBox').addEventListener('click',()=>{if(timer!==null){clearInterval(timer);timer=null;}stepInput.value=4;opened=true;renderStage();});
+$('closeBox').addEventListener('click',()=>{if(timer!==null){clearInterval(timer);timer=null;}stepInput.value=4;opened=false;renderStage();});
 $('assemblyPlay').addEventListener('click',()=>{
  if(geometry?.template!=='tuck')return;
  if(timer!==null){stop();return;}
