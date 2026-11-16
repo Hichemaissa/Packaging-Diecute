@@ -200,40 +200,30 @@ function buildAssembly(){
   face([V(x1,y0,z1),V(x1,y0,z0),V(x1,y1,z0),V(x1,y1,z1)],'#e8c18e');
   face([V(x1,y0,z0),V(x0,y0,z0),V(x0,y1,z0),V(x1,y1,z0)],'#d3a16e');
   face([V(x0,y0,z0),V(x0,y0,z1),V(x0,y1,z1),V(x0,y1,z0)],'#eac393');
-  function cap(top,progress){
-   const t=clamp(progress,0,1),theta=t*Math.PI/2;
-   const y=top?y1:y0,sgn=top?1:-1;
-   const inward=V(0,sgn*Math.cos(theta),Math.sin(theta));
-   const fromZ=z0,edgeZ=z0+W*Math.sin(theta);
-   const outerY=y+sgn*W*Math.cos(theta);
-   // Dust flaps are behind the main lid when the lid closes.
-   for(const x of [x0,x1]){
-    const sx=x===x0?1:-1;
-    const endX=x+sx*W*.48*Math.sin(theta);
-    const endY=y+sgn*W*.48*Math.cos(theta);
-    face([V(x,y,z0),V(x,y,z1),V(endX,endY,z1),V(endX,endY,z0)],'#eed0a3');
-   }
-   face([V(x0,y,fromZ),V(x1,y,fromZ),V(x1,outerY,edgeZ),V(x0,outerY,edgeZ)],top?'#f0cc9d':'#e8bb86');
-   // The tongue folds inward at the free edge.
-   const lip=V(0,-sgn*Math.sin(theta),Math.cos(theta));
-   const p=V(x0,outerY,edgeZ),q=V(x1,outerY,edgeZ);
-   face([p,q,add(q,scale(lip,W*.18)),add(p,scale(lip,W*.18))],'#dbac79');
-  }
   // Bottom lid hinges at the front; top lid hinges at the back.
   // Main panels cover the complete opening at t=1.
   function lid(top,progress){
    const t=clamp(progress,0,1),th=t*Math.PI/2,y=top?y1:y0,sgn=top?1:-1;
    const near=top?z0:z1,dir=top?1:-1;
    const end=near+dir*W*Math.sin(th),ey=y+sgn*W*Math.cos(th);
-   for(const x of [x0,x1]){
-    const sx=x===x0?1:-1,ext=x+sx*Math.min(L*.42,W*.48)*Math.sin(th);
-    const yy=y+sgn*Math.min(L*.42,W*.48)*Math.cos(th);
-    face([V(x,y,z0),V(x,y,z1),V(ext,yy,z1),V(ext,yy,z0)],'#e9c99a');
+   // Dust flaps fold first, then disappear beneath the fully closed lid.
+   // Drawing coplanar flaps over the lid caused the visible closing seams.
+   if(t<.995){
+    for(const x of [x0,x1]){
+     const sx=x===x0?1:-1,depth=Math.min(L*.42,W*.48);
+     const ext=x+sx*depth*Math.sin(th),yy=y+sgn*depth*Math.cos(th);
+     face([V(x,y,z0),V(x,y,z1),V(ext,yy,z1),V(ext,yy,z0)],'#e9c99a');
+    }
    }
+   // The main flap spans exactly W when closed, meeting the opposite wall.
    face([V(x0,y,near),V(x1,y,near),V(x1,ey,end),V(x0,ey,end)],top?'#f0cc9d':'#e8bb86');
-   const lipStart=V(x0,ey,end),lipEnd=V(x1,ey,end);
-   const lipDir=V(0,-sgn*Math.sin(th),dir*Math.cos(th));
-   face([lipStart,lipEnd,add(lipEnd,scale(lipDir,W*.17)),add(lipStart,scale(lipDir,W*.17))],'#dbac79');
+   // At full closure the tuck is inside the carton and should not
+   // appear as an external protruding flap on the rendered surface.
+   if(t<.995){
+    const lipStart=V(x0,ey,end),lipEnd=V(x1,ey,end);
+    const lipDir=V(0,-sgn*Math.sin(th),dir*Math.cos(th));
+    face([lipStart,lipEnd,add(lipEnd,scale(lipDir,W*.17)),add(lipStart,scale(lipDir,W*.17))],'#dbac79');
+   }
   }
   lid(false,fold.bottom);lid(true,fold.top);
   return faces;
