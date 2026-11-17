@@ -51,13 +51,13 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="layout">
 <aside class="panel"><div class="phead"><h3>⚙️ إعدادات العلبة</h3><span class="small muted">الأبعاد mm</span></div><div class="pbody">
 <div class="group"><p class="group-title">نوع العلبة</p><div class="templates"><button id="t-rsc" type="button" class="template" aria-pressed="false"><span class="ticon">📦</span><span><strong>علبة شحن RSC 0201</strong><small>4 واجهات + لسان لصق + ألسنة إغلاق علوية وسفلية</small></span></button><button id="t-tuck" type="button" class="template active" aria-pressed="true"><span class="ticon">🎁</span><span><strong>علبة Tuck End حسب مرجع PDF</strong><small>علبة عطر أو منتج مع ألسنة طي وإغلاق</small></span></button></div></div>
-<div class="group"><p class="group-title">المقاسات الداخلية الاسمية</p><div class="fields"><div class="field"><label for="length">الطول (L)</label><div class="input-wrap"><input id="length" type="number" min="10" max="1000" value="160" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="width">العرض (W)</label><div class="input-wrap"><input id="width" type="number" min="10" max="1000" value="100" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="height">الارتفاع (H)</label><div class="input-wrap"><input id="height" type="number" min="10" max="1200" value="220" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="glue">لسان اللصق</label><div class="input-wrap"><input id="glue" type="number" min="6" max="60" value="18" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field full"><label for="slot">فراغ الشقوق بين ألسنة الإغلاق (RSC)</label><div class="input-wrap"><input id="slot" type="number" min="0" max="12" value="3" step="0.5" inputmode="decimal"><span>mm</span></div><div class="field-note">يُطبق على قالب RSC فقط</div></div></div></div>
+<div class="group"><p class="group-title">المقاسات الداخلية الاسمية</p><div class="fields"><div class="field"><label for="length">الطول (L)</label><div class="input-wrap"><input id="length" type="number" min="10" max="1000" value="160" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="width">العرض (W)</label><div class="input-wrap"><input id="width" type="number" min="10" max="1000" value="100" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="height">الارتفاع (H)</label><div class="input-wrap"><input id="height" type="number" min="10" max="1200" value="220" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="glue">لسان اللصق</label><div class="input-wrap"><input id="glue" type="number" min="6" max="60" value="18" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field full"><label for="thickness">سماكة الكرتون · B Flute (افتراضياً)</label><div class="input-wrap"><input id="thickness" type="number" min="0.5" max="15" value="3" step="0.1" inputmode="decimal"><span>mm</span></div><div class="field-note">سماكة اسمية 3 مم. أدخل السماكة المقاسة عند الإنتاج؛ تعويضات الطي تحتاج معايرة على الكرتون الحقيقي.</div></div><div class="field full"><label for="slot">فراغ الشقوق بين ألسنة الإغلاق (RSC)</label><div class="input-wrap"><input id="slot" type="number" min="0" max="12" value="3" step="0.5" inputmode="decimal"><span>mm</span></div><div class="field-note">يُطبق على قالب RSC فقط</div></div></div></div>
 <div id="error" class="error" role="alert"></div>
 <div class="group"><button type="button" id="generate" class="action primary" style="width:100%">↻ تحديث المخطط</button></div>
 <div class="helper">✓ الأحمر: <b>Cut</b> (قص)<br>✓ الأخضر المتصل: <b>Crease</b> (طي)<br>✓ الـ PDF متجهي بالأبعاد الحقيقية 1:1، وليس مجرد صورة.</div>
 </div></aside>
 <div class="workspace"><section class="panel"><div class="phead toolbar"><div><h3>معاينة المخطط الهندسي</h3><div id="templateDesc" class="small muted" style="margin-top:5px">Tuck End · Flat blank</div></div><div class="legend"><span><i class="swatch"></i> Cut</span><span><i class="swatch fold"></i> Crease</span></div></div><div class="canvas"><svg id="preview" aria-label="معاينة خطوط القص والطي" role="img" viewBox="0 0 600 410"></svg></div><div class="stats"><div class="stat"><small>عرض الفردة</small><b id="netW">—</b></div><div class="stat"><small>ارتفاع الفردة</small><b id="netH">—</b></div><div class="stat"><small>مساحة الفردة التقريبية</small><b id="area">—</b></div></div></section>
-<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><svg class="assembly-model" id="assemblyModel" viewBox="0 0 420 390" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="علبة Tuck End ثلاثية الأبعاد قابلة للتدوير"><g id="assemblyShapes"><polygon points="80,90 235,55 330,115 175,155" fill="#efc997" stroke="#956b3b" stroke-width="2"/><polygon points="80,90 175,155 175,325 80,255" fill="#e2b67f" stroke="#956b3b" stroke-width="2"/><polygon points="175,155 330,115 330,285 175,325" fill="#c99862" stroke="#956b3b" stroke-width="2"/></g><g id="assemblyDimensions" aria-label="الأبعاد الاسمية بالميليمتر"></g></svg></div><div class="assembly-specs" aria-label="مقاسات العلبة"><div class="assembly-spec"><small>L · LENGTH</small><strong id="assemblyLength">160 mm</strong></div><div class="assembly-spec"><small>W · WIDTH</small><strong id="assemblyWidth">100 mm</strong></div><div class="assembly-spec"><small>H · HEIGHT</small><strong id="assemblyHeight">220 mm</strong></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-open-controls"><button type="button" id="turnLeft" class="action ghost">↶ تدوير يسار</button><button type="button" id="turnRight" class="action ghost">↷ تدوير يمين</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyZoom" class="small">🔎 تكبير</label><input id="assemblyZoom" type="range" min="90" max="170" value="110" step="5" aria-label="تكبير نموذج العلبة"><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="4" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية لعلبة Tuck End، تمثل حركة الجوانب والألسنة. الأبعاد والحركة تقريبية وليست بديلاً عن اعتماد قالب إنتاجي.</p></div></section>
+<section class="panel" style="margin-top:17px" aria-label="معاينة تجميع العلبة ثلاثية الأبعاد"><div class="phead"><h3>📦 تجميع العلبة 3D</h3><span class="small muted">Folding & Gluing Preview</span></div><div class="assembly-view" id="assemblyView"><svg class="assembly-model" id="assemblyModel" viewBox="0 0 420 390" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="علبة Tuck End ثلاثية الأبعاد قابلة للتدوير"><g id="assemblyShapes"><polygon points="80,90 235,55 330,115 175,155" fill="#efc997" stroke="#956b3b" stroke-width="2"/><polygon points="80,90 175,155 175,325 80,255" fill="#e2b67f" stroke="#956b3b" stroke-width="2"/><polygon points="175,155 330,115 330,285 175,325" fill="#c99862" stroke="#956b3b" stroke-width="2"/></g><g id="assemblyDimensions" aria-label="الأبعاد الاسمية بالميليمتر"></g></svg></div><div class="assembly-specs" aria-label="مقاسات العلبة"><div class="assembly-spec"><small>L · LENGTH</small><strong id="assemblyLength">160 mm</strong></div><div class="assembly-spec"><small>W · WIDTH</small><strong id="assemblyWidth">100 mm</strong></div><div class="assembly-spec"><small>H · HEIGHT</small><strong id="assemblyHeight">220 mm</strong></div><div class="assembly-spec"><small>BOARD · THICKNESS</small><strong id="assemblyThickness">3 mm</strong></div></div><div class="pbody"><div class="assembly-open-controls"><button type="button" id="openBox" class="action primary">📦 فتح العلبة</button><button type="button" id="closeBox" class="action secondary">🔒 غلق العلبة</button></div><div class="assembly-open-controls"><button type="button" id="turnLeft" class="action ghost">↶ تدوير يسار</button><button type="button" id="turnRight" class="action ghost">↷ تدوير يمين</button></div><div class="assembly-controls"><button class="action primary" id="assemblyPlay" type="button">▶ تشغيل التجميع</button><button class="action ghost" id="assemblyReset" type="button">↺ إعادة</button><label for="assemblyZoom" class="small">🔎 تكبير</label><input id="assemblyZoom" type="range" min="90" max="170" value="110" step="5" aria-label="تكبير نموذج العلبة"><label for="assemblyStep" class="small">المرحلة</label><input id="assemblyStep" type="range" min="0" max="4" value="4" step="1"></div><div class="assembly-note" id="assemblyStatus" aria-live="polite">0/4 — فردة العلبة قبل التجميع. اسحب النموذج لتدويره.</div><p class="small muted">معاينة طي تفاعلية للقالب المحدد مرتبطة بأبعاد مخطط القص. السماكة الاسمية معروضة للتوثيق؛ تعويضات الطي والتصنيع تحتاج معايرة على كرتون حقيقي.</p></div></section>
 <section class="panel" style="margin-top:17px"><div class="phead"><h3>⬇️ تحميل ملفات التصميم</h3><span class="small muted">Vector Files</span></div><div class="pbody"><div class="actions"><button type="button" id="pdf" class="action primary">⬇ تحميل PDF (1:1)</button><button type="button" id="svg" class="action secondary">⬇ تحميل SVG</button></div><p class="small muted" style="line-height:1.8;margin:13px 0 0">PDF قابل للفتح في برامج التصميم والطباعة، وSVG متجهي قابل للتعديل في Illustrator أو Inkscape. عند الطباعة اختر <b>Actual Size / 100%</b> ولا تستعمل Fit to Page.</p></div></section>
 
 </div></div>
@@ -69,8 +69,8 @@ const $=id=>document.getElementById(id);let template='tuck',geometry=null;
 const fmt=n=>Number(Number(n).toFixed(2)).toString();
 function S(x1,y1,x2,y2,kind='cut'){return {x1,y1,x2,y2,kind};}
 function create(){
- const L=+$('length').value,W=+$('width').value,H=+$('height').value,G=+$('glue').value,slot=+$('slot').value;
- if(![L,W,H,G,slot].every(Number.isFinite)||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
+ const L=+$('length').value,W=+$('width').value,H=+$('height').value,G=+$('glue').value,slot=+$('slot').value,thickness=+$('thickness').value;
+ if(![L,W,H,G,slot,thickness].every(Number.isFinite)||thickness<0.5||thickness>15||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
  const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs[xs.length-1]+w));
  const lines=[],curves=[],label=[];
  const add=(x1,y1,x2,y2,kind='cut')=>{if(Math.hypot(x2-x1,y2-y1)>0.00001)lines.push(S(x1,y1,x2,y2,kind));};
@@ -128,7 +128,7 @@ function create(){
  }
  const maxX=xs[4],maxY=bodyEnd+bottom;
  if(maxX>4900||maxY>4900)throw Error('المخطط كبير على تنسيق PDF الحالي.');
- return {L,W,H,G,slot,template,lines,curves,label,width:maxX,height:maxY,bodyY,bodyEnd};
+ return {L,W,H,G,slot,thickness,template,lines,curves,label,width:maxX,height:maxY,bodyY,bodyEnd};
 }
 function makeSvg(g,includeLabels=true){
  const pad=Math.max(12,Math.min(g.width,g.height)*.08),w=g.width+pad*2,h=g.height+pad*2;
@@ -193,7 +193,7 @@ const safeName=g=>`LOuest_${g.template.toUpperCase()}_${g.L}x${g.W}x${g.H}`;
 $('t-rsc').addEventListener('click',()=>setTemplate('rsc'));
 $('t-tuck').addEventListener('click',()=>setTemplate('tuck'));
 $('generate').addEventListener('click',update);
-['length','width','height','glue','slot'].forEach(id=>$(id).addEventListener('input',update));
+['length','width','height','glue','slot','thickness'].forEach(id=>$(id).addEventListener('input',update));
 $('svg').addEventListener('click',()=>{update();if(geometry)download(new Blob([makeSvg(geometry,false)],{type:'image/svg+xml;charset=utf-8'}),safeName(geometry)+'.svg')});
 $('pdf').addEventListener('click',()=>{
  try{
@@ -217,7 +217,7 @@ const fold={walls:0,glue:0,bottom:0,top:0},target={...fold};
 const stageNames=['الفردة المسطحة','طي الجوانب','إغلاق لسان اللصق','طي القاعدة','إغلاق الغطاء'];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function buildAssembly(){
- if(!geometry||geometry.template!=='tuck')return [];
+ if(!geometry)return [];
  const {L,W,H,G}=geometry,faces=[];
  const face=(points,color)=>faces.push({points,color});
  const x0=-L/2,x1=L/2,y0=-H/2,y1=H/2,z0=-W/2,z1=W/2;
@@ -229,6 +229,25 @@ function buildAssembly(){
   face([V(x1,y0,z1),V(x1,y0,z0),V(x1,y1,z0),V(x1,y1,z1)],'#e8c18e');
   face([V(x1,y0,z0),V(x0,y0,z0),V(x0,y1,z0),V(x1,y1,z0)],'#d3a16e');
   face([V(x0,y0,z0),V(x0,y0,z1),V(x0,y1,z1),V(x0,y1,z0)],'#eac393');
+  if(geometry.template==='rsc'){
+   // Nominal RSC 0201 visualization; manufacturing fold allowances require calibration.
+   const rscFlap=(top,t,side)=>{
+    const p=clamp(t,0,1),th=p*Math.PI/2,y=top?y1:y0,sgn=top?1:-1;
+    const depth=W/2,vertical=sgn*depth*Math.cos(th),inside=depth*Math.sin(th);
+    let a,b,normal;
+    if(side===0){a=V(x0,y,z1);b=V(x1,y,z1);normal=V(0,0,-inside);}
+    else if(side===2){a=V(x1,y,z0);b=V(x0,y,z0);normal=V(0,0,inside);}
+    else if(side===1){a=V(x1,y,z1);b=V(x1,y,z0);normal=V(-inside,0,0);}
+    else {a=V(x0,y,z0);b=V(x0,y,z1);normal=V(inside,0,0);}
+    const delta=add(normal,V(0,vertical,0));
+    face([a,b,add(b,delta),add(a,delta)],top?'#edc393':'#ddaf7c');
+   };
+   for(let side=0;side<4;side++){
+    rscFlap(false,fold.bottom,side);
+    rscFlap(true,fold.top,side);
+   }
+   return faces;
+  }
   // Bottom lid hinges at the front; top lid hinges at the back.
   // Main panels cover the complete opening at t=1.
   function lid(top,progress){
@@ -278,6 +297,12 @@ function buildAssembly(){
     face([q0,q1,add(q1,scale(tongueDir,W*.17)),add(q0,scale(tongueDir,W*.17))],'#d6a674');
    }
   };
+  if(geometry.template==='rsc'){
+   flap(true,W/2,fold.top,false);
+   flap(false,W/2,fold.bottom,false);
+   if(i===0)face([add(a,scale(axis,-G)),a,d,add(d,scale(axis,-G))],'#be8955');
+   origin=b;angle+=turn;continue;
+  }
   if(i===0){
    flap(false,W,fold.bottom,true);
    face([add(a,scale(axis,-G)),a,d,add(d,scale(axis,-G))],'#be8955');
@@ -300,11 +325,11 @@ function cameraPoint(p){
  return [x*perspective,y*perspective,depth];
 }
 function drawAssembly(){
- if(!geometry||geometry.template!=='tuck'){
+ if(!geometry){
   shapes.textContent='';
   const t=document.createElementNS('http://www.w3.org/2000/svg','text');
   t.setAttribute('x','210');t.setAttribute('y','195');t.setAttribute('text-anchor','middle');
-  t.textContent='3D: Tuck End فقط';shapes.appendChild(t);return;
+  t.textContent='3D: تعذر توليد المخطط';shapes.appendChild(t);return;
  }
  const projected=buildAssembly().map(f=>({...f,p:f.points.map(cameraPoint)}));
  const all=projected.flatMap(f=>f.p);
@@ -361,6 +386,7 @@ function drawAssembly(){
  $('assemblyLength').textContent=geometry.L+' mm';
  $('assemblyWidth').textContent=geometry.W+' mm';
  $('assemblyHeight').textContent=geometry.H+' mm';
+ $('assemblyThickness').textContent=geometry.thickness+' mm';
 }
 function animateAssembly(){
  if(state.raf)return;
