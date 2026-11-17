@@ -50,7 +50,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="intro"><div><h2>حوّل المقاسات إلى Diecut جاهز للتصدير</h2><p>أدخل الأبعاد بالميليمتر، شاهد المخطط، وحمّل ملف PDF متجهي بالحجم الحقيقي.</p></div><span class="pill">● يعمل حتى بلا إنترنت</span></div>
 <div class="layout">
 <aside class="panel"><div class="phead"><h3>⚙️ إعدادات العلبة</h3><span class="small muted">الأبعاد mm</span></div><div class="pbody">
-<div class="group"><p class="group-title">نوع العلبة</p><div class="templates"><button id="t-tuck" type="button" class="template active" aria-pressed="true"><span class="ticon">🎁</span><span><strong>علبة Tuck End حسب مرجع PDF</strong><small>علبة عطر أو منتج مع ألسنة طي وإغلاق</small></span></button></div></div>
+<div class="group"><p class="group-title">نوع العلبة</p><div class="templates"><button id="t-rsc" type="button" class="template" aria-pressed="false"><span class="ticon">📦</span><span><strong>علبة شحن RSC 0201</strong><small>4 واجهات + لسان لصق + ألسنة إغلاق علوية وسفلية</small></span></button><button id="t-tuck" type="button" class="template active" aria-pressed="true"><span class="ticon">🎁</span><span><strong>علبة Tuck End حسب مرجع PDF</strong><small>علبة عطر أو منتج مع ألسنة طي وإغلاق</small></span></button></div></div>
 <div class="group"><p class="group-title">المقاسات الداخلية الاسمية</p><div class="fields"><div class="field"><label for="length">الطول (L)</label><div class="input-wrap"><input id="length" type="number" min="10" max="1000" value="160" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="width">العرض (W)</label><div class="input-wrap"><input id="width" type="number" min="10" max="1000" value="100" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="height">الارتفاع (H)</label><div class="input-wrap"><input id="height" type="number" min="10" max="1200" value="220" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="glue">لسان اللصق</label><div class="input-wrap"><input id="glue" type="number" min="6" max="60" value="18" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field full"><label for="slot">فراغ الشقوق بين ألسنة الإغلاق (RSC)</label><div class="input-wrap"><input id="slot" type="number" min="0" max="12" value="3" step="0.5" inputmode="decimal"><span>mm</span></div><div class="field-note">يُطبق على قالب RSC فقط</div></div></div></div>
 <div id="error" class="error" role="alert"></div>
 <div class="group"><button type="button" id="generate" class="action primary" style="width:100%">↻ تحديث المخطط</button></div>
@@ -83,13 +83,20 @@ function create(){
  const inset=Math.min(G*.46,H*.09);
  path([[G,bodyY],[0,bodyY+inset],[0,bodyEnd-inset],[G,bodyEnd]]);
  if(!tuck){
+  // RSC 0201 reference: four rectangular top/bottom flap pairs, straight slit cuts,
+  // continuous horizontal scores, four vertical panel scores and a tapered glue tab.
+  // Flap reach is half the carton width, so opposing major flaps meet at the centre.
   if(slot>=Math.min(L,W)/3)throw Error('فراغ الشقوق كبير مقارنة بعرض الألواح.');
+  const d=W/2;
   for(let i=0;i<4;i++){
-   const a=xs[i],b=xs[i+1],left=a+(i>0?slot/2:0),right=b-(i<3?slot/2:0),d=W/2;
-   path([[a,bodyY],[left,bodyY],[left,bodyY-d],[right,bodyY-d],[right,bodyY],[b,bodyY]]);
-   path([[a,bodyEnd],[left,bodyEnd],[left,bodyEnd+d],[right,bodyEnd+d],[right,bodyEnd],[b,bodyEnd]]);
+   const a=xs[i],b=xs[i+1];
+   const left=a+(i===0?0:slot/2),right=b-(i===3?0:slot/2);
+   // Cut perimeter of each flap; the top/bottom edges of the body are creases.
+   add(left,bodyY,left,bodyY-d);add(left,bodyY-d,right,bodyY-d);add(right,bodyY-d,right,bodyY);
+   add(left,bodyEnd,left,bodyEnd+d);add(left,bodyEnd+d,right,bodyEnd+d);add(right,bodyEnd+d,right,bodyEnd);
    add(a,bodyY,b,bodyY,'crease');add(a,bodyEnd,b,bodyEnd,'crease');
   }
+  // Adjacent flap edges are separated by a single straight slot.
  }else{
   // Proportional recreation of the user's single-page reference silhouette.
   // This does not substitute for a certified Prinect manufacturing library template.
@@ -134,8 +141,8 @@ function makeSvg(g,includeLabels=true){
  g.label.forEach(o=>{head+=`<text x="${fmt(o.x+pad)}" y="${fmt(o.y+pad)}">${o.text}</text>`});head+='</g>'}
  return head+'</svg>';
 }
-function setTemplate(t){template=t;for(let k of ['tuck']){$('t-'+k).classList.toggle('active',k===t);$('t-'+k).setAttribute('aria-pressed',String(k===t));}
- $('templateDesc').textContent='Tuck End · Reference dieline · Fix 05';
+function setTemplate(t){template=t;for(let k of ['rsc','tuck']){$('t-'+k).classList.toggle('active',k===t);$('t-'+k).setAttribute('aria-pressed',String(k===t));}
+ $('templateDesc').textContent=t==='rsc'?'RSC 0201 · Regular Slotted Container':'Tuck End · Reference dieline · Fix 05';
  update();}
 function update(){try{geometry=create();$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('error').style.display='none';$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';try{assemblyDims(geometry)}catch(err){console.error('3D preview failed:',err);$('assemblyStatus').textContent='تعذر عرض 3D؛ مخطط 2D متاح';}}
 catch(e){geometry=null;$('error').textContent=e.message;$('error').style.display='block';$('netW').textContent=$('netH').textContent=$('area').textContent='—';}}
@@ -183,6 +190,7 @@ function makePdf(g){
  return new Blob(parts,{type:'application/pdf'});
 }
 const safeName=g=>`LOuest_${g.template.toUpperCase()}_${g.L}x${g.W}x${g.H}`;
+$('t-rsc').addEventListener('click',()=>setTemplate('rsc'));
 $('t-tuck').addEventListener('click',()=>setTemplate('tuck'));
 $('generate').addEventListener('click',update);
 ['length','width','height','glue','slot'].forEach(id=>$(id).addEventListener('input',update));
