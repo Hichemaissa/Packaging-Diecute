@@ -302,6 +302,19 @@ function buildAssembly(){
    face([V(x,y0,z0),V(x,y0,z1),hinge(z1,lip),hinge(z0,H)],
     dir<0?'#eac393':'#d3a16e');
   }
+  // Two attachment tabs from the original PDF, hinged to the outer
+  // vertical edges of the sloped side cheeks (one on each side).
+  // They remain visible at the flat stage and rotate with their parent cheek.
+  const tabDepth=Math.min(W/2,L/2),tabHeight=Math.min(L/2,H/2);
+  for(const dir of [-1,1]){
+   const x=dir<0?x0:x1;
+   const cheek=(z,h)=>V(x+dir*h*cs,y0+h*s,z);
+   const tabZ=dir<0?z0:z1;
+   const outerZ=tabZ+dir*tabDepth;
+   face([cheek(tabZ,0),cheek(tabZ,tabHeight),
+         cheek(outerZ,tabHeight),cheek(outerZ,0)],
+        dir<0?'#bd8b5e':'#c99566');
+  }
   // The short front lip and tall back advertising panel fold independently.
   face([V(x0,y0,z1),V(x1,y0,z1),
         V(x1,y0+lip*sf,z1+lip*cf),V(x0,y0+lip*sf,z1+lip*cf)],'#e2b67f');
