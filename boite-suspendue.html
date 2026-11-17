@@ -22,7 +22,10 @@ push(5,poly([[W/2,-H/2,-D/2],[W/2,-H/2,D/2],[W/2,H/2,D/2],[W/2,H/2,-D/2]],'#dcb0
 push(55,poly([[-W/2,-H/2,D/2],[W/2,-H/2,D/2],[W/2,H/2,D/2],[-W/2,H/2,D/2]],'#edcc9a'));
 push(5,poly([[-W/2,-H/2,-D/2],[W/2,-H/2,-D/2],[W/2,-H/2,D/2],[-W/2,-H/2,D/2]],'#bb8e65'));
 const hangerZ=-D/2-2;
-push(-75,poly([[-W/2,H/2,hangerZ],[W/2,H/2,hangerZ],[W/2,H/2+185,hangerZ],[-W/2,H/2+185,hangerZ]],'#f5d9ab')+ln([-W/2,H/2+92,hangerZ],[W/2,H/2+92,hangerZ])+hole(H/2+48)+hole(H/2+139));
+// Separate the two hanging panels at their actual fold line; both remain upright when opening.
+const hangFold=H/2+92, hangTop=H/2+185;
+push(-75,poly([[-W/2,H/2,hangerZ],[W/2,H/2,hangerZ],[W/2,hangFold,hangerZ],[-W/2,hangFold,hangerZ]],'#f5d9ab'));
+push(-74,poly([[-W/2,hangFold,hangerZ-1],[W/2,hangFold,hangerZ-1],[W/2,hangTop,hangerZ-1],[-W/2,hangTop,hangerZ-1]],'#efd0a0')+ln([-W/2,hangFold,hangerZ],[W/2,hangFold,hangerZ],'#a56f40')+hole(H/2+48)+hole(H/2+139));
 for(let sign of [-1,1]){let x=sign*W/2,tx=x-sign*D*.43*Math.cos(beta),ty=H/2+D*.43*Math.sin(beta);push(18,poly([[x,H/2,-D/2+5],[x,H/2,D/2-5],[tx,ty,D/2-18],[tx,ty,-D/2+18]],'#ecd2a4'))}
 function c(x,d){return [x,H/2+d*Math.sin(alpha),-D/2+d*Math.cos(alpha)]}
 push(70,poly([c(-W/2,0),c(W/2,0),c(W/2,D),c(-W/2,D)],'#f5dcb7'));
