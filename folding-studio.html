@@ -3,7 +3,7 @@
 </style></head><body>
 <header><strong>L'Ouest Packaging · Folding Studio</strong> — lightweight folding mechanics</header><main><div id="stage"><div id="message">Drag to orbit · wheel to zoom</div></div><aside><h3>Parametric folding prototype</h3>
 <label>Length · mm<input id="L" type="number" min="20" max="500" value="160"></label><label>Width · mm<input id="W" type="number" min="20" max="500" value="100"></label><label>Height · mm<input id="H" type="number" min="20" max="500" value="220"></label><label>Board · mm<input id="T" type="number" min=".2" max="8" step=".1" value="1"></label>
-<label>Folding progress · <output id="percent">100%</output><input id="fold" type="range" min="0" max="100" value="100"></label><button id="play">▶ Animate folding</button><button id="reset">Reset camera</button><small>Lightweight interactive five-panel open-top carton. This is a mechanical visualization, not a validated dieline, FEFCO construction, or production-ready crease allowance. Existing SVG diecut calculations are unchanged.</small></aside></main>
+<label>Sequential folding · <output id="percent">100%</output><input id="fold" type="range" min="0" max="100" value="100"></label><button id="play">▶ Animate folding</button><button id="reset">Reset camera</button><small>Lightweight interactive five-panel open-top carton. This is a mechanical visualization, not a validated dieline, FEFCO construction, or production-ready crease allowance. Existing SVG diecut calculations are unchanged.</small></aside></main>
 <script>
 (()=>{
 const $=id=>document.getElementById(id),stage=$('stage');
@@ -16,16 +16,20 @@ function render(){
  ctx.clearRect(0,0,w,h);ctx.fillStyle='#192633';ctx.fillRect(0,0,w,h);
  const L=+$('L').value,W=+$('W').value,H=+$('H').value,T=+$('T').value;
  if(![L,W,H,T].every(Number.isFinite)||Math.min(L,W,H,T)<=0||T*2>=Math.min(L,W,H)){$('message').textContent='Invalid dimensions';return}
- const f=+$('fold').value/100,a=f*Math.PI/2;$('percent').textContent=Math.round(f*100)+'%';
+ const f=+$('fold').value/100;$('percent').textContent=Math.round(f*100)+'%';
  const faces=[];
  const base=[[-L/2,0,-W/2],[L/2,0,-W/2],[L/2,0,W/2],[-L/2,0,W/2]];
  faces.push(base);
  // Rotate outward flat flaps about their respective base edges, towards vertical at 100%.
- for(const sign of [-1,1]){
-  const x=sign*L/2,dx=sign*H*Math.cos(a),dy=H*Math.sin(a);
+ const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
+ // Four distinct hinge phases, each rotating outwards from the flat net.
+ const phases=[smooth(f*4),smooth(f*4-1),smooth(f*4-2),smooth(f*4-3)];
+ for(const [i,sign] of [-1,1].entries()){
+  const ax=phases[i]*Math.PI/2,az=phases[i+2]*Math.PI/2;
+  const x=sign*L/2,dx=sign*H*Math.cos(ax),dy=H*Math.sin(ax);
   faces.push([[x,0,-W/2],[x,0,W/2],[x+dx,dy,W/2],[x+dx,dy,-W/2]]);
-  const z=sign*W/2,dz=sign*H*Math.cos(a);
-  faces.push([[-L/2,0,z],[L/2,0,z],[L/2,dy,z+dz],[-L/2,dy,z+dz]]);
+  const z=sign*W/2,dz=sign*H*Math.cos(az),zy=H*Math.sin(az);
+  faces.push([[-L/2,0,z],[L/2,0,z],[L/2,zy,z+dz],[-L/2,zy,z+dz]]);
  }
  const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
  const scale=Math.min(w/(L+2*H),h/(W+2*H))*1.7*zoom;
