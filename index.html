@@ -72,6 +72,7 @@ function create(){
  const L=+$('length').value,W=+$('width').value,H=+$('height').value,G=+$('glue').value,slot=+$('slot').value,thickness=+$('thickness').value;
  if(![L,W,H,G,slot,thickness].every(Number.isFinite)||thickness<0.5||thickness>15||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
  if(template==='display'){
+  if(H<=L/2)throw Error('في قالب Présentoir يجب أن يكون الارتفاع أكبر من نصف الطول لتجنب تداخل خطوط القص.');
   // Exact topology traced from the user-supplied Templatemaker vector PDF.
   // PDF axis: X=0, L, L+W/2, L+W/2+L, etc.; Y=0, H, H+W, H+W+H.
   // L=50, W=60, H=80 reproduces the reference at its native 1:1 size.
@@ -177,6 +178,9 @@ function setTemplate(t){template=t;for(let k of ['rsc','tuck','display']){$('t-'
  if(typeof stopPlayback==='function')stopPlayback();
  const assembly=$('assemblyView').closest('section');assembly.style.display=t==='display'?'none':'';
  if(t==='display'&&+$('length').value===160&&+$('width').value===100&&+$('height').value===220){$('length').value=50;$('width').value=60;$('height').value=80;}
+ $('slot').closest('.field').style.display=t==='rsc'?'':'none';
+ $('glue').closest('.field').style.display=t==='display'?'none':'';
+ $('thickness').closest('.field').querySelector('.field-note').textContent=t==='display'?'السماكة للتوثيق فقط؛ لم تُحتسب تعويضات الطي في مخطط Présentoir.':'سماكة اسمية 3 مم. أدخل السماكة المقاسة عند الإنتاج؛ تعويضات الطي تحتاج معايرة على الكرتون الحقيقي.';
  update();}
 function update(){try{geometry=create();$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('error').style.display='none';$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';try{assemblyDims(geometry)}catch(err){console.error('3D preview failed:',err);$('assemblyStatus').textContent='تعذر عرض 3D؛ مخطط 2D متاح';}}
 catch(e){geometry=null;$('error').textContent=e.message;$('error').style.display='block';$('netW').textContent=$('netH').textContent=$('area').textContent='—';}}
@@ -228,7 +232,7 @@ function makePdf(g){
  write(`trailer\n<< /Size ${objects.length+1} /Root 1 0 R >>\nstartxref\n${startxref}\n%%EOF\n`);
  return new Blob(parts,{type:'application/pdf'});
 }
-const safeName=g=>`LOuest_${g.template.toUpperCase()}_${g.L}x${g.W}x${g.H}`;
+const safeName=g=>`LOuest_${g.template==='display'?'PRESENTOIR':g.template.toUpperCase()}_${g.L}x${g.W}x${g.H}mm_1to1`;
 $('t-rsc').addEventListener('click',()=>setTemplate('rsc'));
 $('t-tuck').addEventListener('click',()=>setTemplate('tuck'));
 $('t-display').addEventListener('click',()=>setTemplate('display'));
