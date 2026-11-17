@@ -98,10 +98,19 @@ function create(){
   crease(x3+tolerance,y2,x2-tolerance,y2);
   crease(x2-tolerance,y2,x2-tolerance,y3);
   crease(x2-tolerance,y3,x2+L/2,y3);
+  // Explicit fold-panel inventory shared with the 3D inspection workflow.
+  // These are reference dieline regions, not yet a validated manufacturing assembly.
+  const panels=[
+   {id:'base',name:'قاعدة العرض',polygon:[[x2,y2],[x3,y2],[x3,y3],[x2,y3]]},
+   {id:'back',name:'اللوحة الخلفية',polygon:[[x1,y3],[x2,y3],[x2,y5],[x1,y5]]},
+   {id:'front',name:'الواجهة الأمامية',polygon:[[x3,y2],[x4,y2],[x4,y3],[x3,y3]]},
+   {id:'sideA',name:'الجناح المائل الأول',polygon:[[x2,y0],[x3,y1],[x3,y2],[x2,y2]]},
+   {id:'sideB',name:'الجناح المائل الثاني',polygon:[[x2,y5],[x3,y4],[x3,y3],[x2,y3]]}
+  ];
   label.push({x:(x2+x3)/2,y:(y2+y3)/2,text:'BASE'});
   const maxX=Math.max(x4,x5),maxY=y5;
   if(maxX>4900||maxY>4900)throw Error('المخطط كبير على تنسيق PDF الحالي.');
-  return {L,W,H,G,slot,thickness,template,lines,curves,label,width:maxX,height:maxY,bodyY:y2,bodyEnd:y3};
+  return {L,W,H,G,slot,thickness,template,lines,curves,label,panels,width:maxX,height:maxY,bodyY:y2,bodyEnd:y3};
  }
  const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs[xs.length-1]+w));
  const lines=[],curves=[],label=[];
