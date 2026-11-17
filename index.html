@@ -268,7 +268,7 @@ function buildAssembly(){
  if(geometry.template==='display'){
   // Counter-display concept: low front lip, rising side cheeks and tall rear panel.
   // H is the overall rear height. This is a visual concept, not a validated fold simulation.
-  const frontTop=y0+H*.38, sideRearTop=y0+H*.78;
+  const frontTop=y0+H*(25/80), sideRearTop=y1;
   face([V(x0,y0,z0),V(x1,y0,z0),V(x1,y0,z1),V(x0,y0,z1)],'#c99862');
   // Front opening is low, so products are visible.
   face([V(x0,y0,z1),V(x1,y0,z1),V(x1,frontTop,z1),V(x0,frontTop,z1)],'#e2b67f');
