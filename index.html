@@ -72,32 +72,35 @@ function create(){
  const L=+$('length').value,W=+$('width').value,H=+$('height').value,G=+$('glue').value,slot=+$('slot').value,thickness=+$('thickness').value;
  if(![L,W,H,G,slot,thickness].every(Number.isFinite)||thickness<0.5||thickness>15||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
  if(template==='display'){
-  // Shape traced from the supplied 50 x 60 x 80 mm Counter Display reference.
-  // L = 50 mm central base width, W = 60 mm base depth, H = 80 mm wall height.
+  // Exact topology traced from the user-supplied Templatemaker vector PDF.
+  // PDF axis: X=0, L, L+W/2, L+W/2+L, etc.; Y=0, H, H+W, H+W+H.
+  // L=50, W=60, H=80 reproduces the reference at its native 1:1 size.
   const lines=[],curves=[],label=[];
-  const seg=(x1,y1,x2,y2,kind='cut')=>{if(Math.hypot(x2-x1,y2-y1)>1e-6)lines.push(S(x1,y1,x2,y2,kind));};
-  const poly=(p,kind='cut')=>{for(let i=1;i<p.length;i++)seg(p[i-1][0],p[i-1][1],p[i][0],p[i][1],kind);};
-  const a=0,b=H,c=H+L,d=c+W*.42,e=d+Math.min(G*.35,W*.14);
-  const t=H,bt=t+W,high=H,low=W*.40,offset=W*.50;
-  // Contiguous perimeter of the flat reference, retaining angled side panels.
-  poly([[a,t],[b-offset,t],[b-offset,t-high],[b,t-high],[c,t-low],[e,t-low],[e,t],[d,t],[d,bt],[e,bt],[e,bt+low],[c,bt+low],[b,bt+high],[b-offset,bt+high],[b-offset,bt],[a,bt],[a,t]]);
-  // Scoring is distinct from the cut perimeter: base and side panel hinges.
-  seg(b,t,b,bt,'crease');
-  seg(c,t,c,bt,'crease');
-  seg(b,t,c,t,'crease');
-  seg(b,bt,c,bt,'crease');
-  seg(c,t-low,c,t,'crease');
-  seg(c,bt,c,bt+low,'crease');
-  seg(d,t-low,d,t,'crease');
-  seg(d,bt,d,bt+low,'crease');
-  seg(d,t,d,bt,'crease');
-  // Upper and lower wing-to-wall folds.
-  seg(b-offset,t,b,t,'cut');
-  seg(b-offset,bt,b,bt,'cut');
-  label.push({x:(b+c)/2,y:(t+bt)/2,text:'BASE'});
-  const maxX=e,maxY=bt+high;
+  const cut=(x1,y1,x2,y2)=>lines.push(S(x1,y1,x2,y2,'cut'));
+  const crease=(x1,y1,x2,y2)=>lines.push(S(x1,y1,x2,y2,'crease'));
+  const path=p=>{for(let i=1;i<p.length;i++)cut(...p[i-1],...p[i]);};
+  const x0=0,x1=L+0.5,x2=x1+W/2,x3=x2+L,x4=x3+L/2+0.5,x5=x3+W/2;
+  const y0=0,y1=H-L/2,y2=H,y3=H+W,y4=y3+L/2,y5=y3+H;
+  // Pink cuts: reference PDF's 20 segments, preserving both angled wings.
+  path([[x2,y3],[x1,y3],[x1,y5],[x2,y5],[x3,y4],[x5,y4],[x5,y3],[x3,y3]]);
+  path([[x3,y3],[x4,y3],[x4,y2],[x3,y2]]);
+  path([[x3,y2],[x5,y2],[x5,y1],[x3,y1],[x2,y0],[x1,y0],[x1,y2],[x2,y2]]);
+  path([[x1,y2],[x0,y2],[x0,y3],[x1,y3]]);
+  // Blue creases: actual coordinates from vector layer, no inferred diagonals.
+  crease(x2,y3,x2,y5);
+  crease(x3,y4,x3,y3);
+  crease(x3,y2,x3,y1);
+  crease(x2,y0,x2,y2);
+  const tolerance=0.5; // original PDF's centre fold layer is offset about 0.5 mm
+  crease(x2+L/2,y3,x3+tolerance,y3);
+  crease(x3+tolerance,y3,x3+tolerance,y2);
+  crease(x3+tolerance,y2,x2-tolerance,y2);
+  crease(x2-tolerance,y2,x2-tolerance,y3);
+  crease(x2-tolerance,y3,x2+L/2,y3);
+  label.push({x:(x2+x3)/2,y:(y2+y3)/2,text:'BASE'});
+  const maxX=Math.max(x4,x5),maxY=y5;
   if(maxX>4900||maxY>4900)throw Error('المخطط كبير على تنسيق PDF الحالي.');
-  return {L,W,H,G,slot,thickness,template,lines,curves,label,width:maxX,height:maxY,bodyY:t,bodyEnd:bt};
+  return {L,W,H,G,slot,thickness,template,lines,curves,label,width:maxX,height:maxY,bodyY:y2,bodyEnd:y3};
  }
  const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs[xs.length-1]+w));
  const lines=[],curves=[],label=[];
