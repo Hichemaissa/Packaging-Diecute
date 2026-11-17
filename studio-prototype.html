@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Packaging 3D Studio Prototype</title><style>
+*{box-sizing:border-box}body{margin:0;background:#101923;color:#edf3f7;font:14px system-ui}header{padding:18px 24px;background:#182633;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}main{display:grid;grid-template-columns:minmax(0,1fr) 270px;min-height:calc(100vh - 60px)}#viewport{position:relative;min-height:520px}#viewport canvas{display:block}aside{background:#182633;padding:20px;display:grid;align-content:start;gap:14px}label{display:grid;gap:6px}input,select,button{padding:10px;border:1px solid #52616e;border-radius:8px;background:#253744;color:white}button{cursor:pointer;background:#176b83}small{color:#b4c4d2}#status{position:absolute;bottom:16px;left:18px;color:#bcd0de;pointer-events:none}@media(max-width:750px){main{grid-template-columns:1fr}#viewport{min-height:400px}}
+</style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script></head><body>
+<header><strong>L'Ouest Packaging · 3D Studio</strong><small>Experimental closed-carton renderer · original dielines untouched</small></header><main><div id="viewport"><div id="status">Drag to rotate · scroll to zoom</div></div><aside><h3>Studio Controls</h3>
+<label>Length (mm)<input id="L" type="number" min="10" max="1000" value="160"></label>
+<label>Width (mm)<input id="W" type="number" min="10" max="1000" value="100"></label>
+<label>Height (mm)<input id="H" type="number" min="10" max="1000" value="220"></label>
+<label>Board thickness (mm)<input id="T" type="number" min=".2" max="20" step=".1" value="1"></label>
+<label>Finish<select id="finish"><option value="matte">Matte paperboard</option><option value="gloss">Gloss coated</option><option value="kraft">Kraft</option></select></label>
+<label>Studio light<input id="light" type="range" min=".4" max="3" step=".1" value="1.5"></label><button id="reset">Reset camera</button>
+<small>Prototype only: dimensions, board shell, lighting, shadows, orbit. Folding, artwork mapping, FEFCO-specific structures, and manufacturing validation are not yet implemented.</small></aside></main>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const el=id=>document.getElementById(id),root=el('viewport');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x17232f);
+const camera=new THREE.PerspectiveCamera(35,1,.1,5000);camera.position.set(420,310,480);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;root.prepend(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=60;controls.maxDistance=2400;
+scene.add(new THREE.HemisphereLight(0xe6f1ff,0x48535e,1.3));
+const key=new THREE.DirectionalLight(0xfff2df,1.5);key.position.set(250,420,220);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-700,right:700,top:700,bottom:-700});key.shadow.bias=-.0002;scene.add(key);
+const fill=new THREE.DirectionalLight(0xc0dfff,.8);fill.position.set(-240,140,-180);scene.add(fill);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),new THREE.MeshStandardMaterial({color:0x273746,roughness:.9}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+let carton=null,edges=null;
+function build(){
+const L=+el('L').value,W=+el('W').value,H=+el('H').value,T=+el('T').value;
+if(![L,W,H,T].every(Number.isFinite)||Math.min(L,W,H,T)<=0||T*2>=Math.min(L,W,H)){el('status').textContent='Invalid dimensions: thickness must be less than half the smallest dimension';return}
+if(carton){scene.remove(carton);carton.geometry.dispose();carton.material.dispose();scene.remove(edges);edges.geometry.dispose();edges.material.dispose()}
+const finish=el('finish').value;
+const mat=new THREE.MeshPhysicalMaterial({color:finish==='kraft'?0xb88a52:0xe8cda6,roughness:finish==='gloss'?.23:.82,metalness:0,clearcoat:finish==='gloss'?.35:0,side:THREE.DoubleSide});
+const outer=new THREE.BoxGeometry(L,H,W),inner=new THREE.BoxGeometry(L-2*T,H-2*T,W-2*T);
+const outerMesh=new THREE.Mesh(outer,mat);outerMesh.castShadow=true;outerMesh.receiveShadow=true;
+carton=outerMesh;scene.add(carton);
+edges=new THREE.LineSegments(new THREE.EdgesGeometry(outer),new THREE.LineBasicMaterial({color:0x8a633e,transparent:true,opacity:.5}));scene.add(edges);
+floor.position.y=-H/2-2;
+controls.target.set(0,0,0);controls.update();el('status').textContent='Closed carton preview · '+L+' × '+W+' × '+H+' mm · '+T+' mm board';
+inner.dispose();
+}
+['L','W','H','T','finish'].forEach(id=>el(id).addEventListener('input',build));el('light').addEventListener('input',()=>key.intensity=+el('light').value);
+el('reset').addEventListener('click',()=>{camera.position.set(420,310,480);controls.target.set(0,0,0);controls.update()});
+function resize(){const w=root.clientWidth,h=root.clientHeight;camera.aspect=w/Math.max(1,h);camera.updateProjectionMatrix();renderer.setSize(w,h,false)}new ResizeObserver(resize).observe(root);resize();build();
+renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});
+</script></body></html>
