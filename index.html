@@ -72,39 +72,32 @@ function create(){
  const L=+$('length').value,W=+$('width').value,H=+$('height').value,G=+$('glue').value,slot=+$('slot').value,thickness=+$('thickness').value;
  if(![L,W,H,G,slot,thickness].every(Number.isFinite)||thickness<0.5||thickness>15||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
  if(template==='display'){
-  // Counter Display reference: L=front width, W=base depth, H=high rear/side panel.
-  // Nominal 50 x 60 x 80 mm; thin-board reference, score allowances need production calibration.
+  // Shape traced from the supplied 50 x 60 x 80 mm Counter Display reference.
+  // L = 50 mm central base width, W = 60 mm base depth, H = 80 mm wall height.
   const lines=[],curves=[],label=[];
-  const seg=(x1,y1,x2,y2,kind='cut')=>lines.push(S(x1,y1,x2,y2,kind));
-  const poly=(p,kind='cut')=>{for(let i=1;i<p.length;i++)seg(...p[i-1],...p[i],kind);};
-  const x0=0,x1=H,x2=H+L,x3=x2+W*.5,x4=x3+Math.min(G,W*.25);
-  const y0=H,y1=H+W;
-  const shoulder=H*.7, tab=Math.min(W*.25,H*.22);
-  // Outer perimeter: long front/side panel, two angled display wings, mounting tabs.
-  poly([[x0,y0],[x1-W*.5,y0],[x1-W*.5,0],[x1,0],[x3,y0-shoulder],[x4,y0-shoulder],[x4,y0],[x3,y0],[x3,y1],[x4,y1],[x4,y1+tab],[x3,y1+tab],[x1,y1+H],[x1-W*.5,y1+H],[x1-W*.5,y1],[x0,y1],[x0,y0]]);
-  // Outer tab and wing boundaries which are not in the single perimeter walk.
-  seg(x1,0,x1, y0,'crease');
-  seg(x1,y1,x1,y1+H,'crease');
-  seg(x1,y0,x2,y0,'crease');
-  seg(x1,y1,x2,y1,'crease');
-  seg(x2,y0-shoulder,x2,y0,'crease');
-  seg(x2,y1,x2,y1+shoulder,'crease');
-  seg(x2,y0,x3,y0,'crease');
-  seg(x2,y1,x3,y1,'crease');
-  seg(x3,y0-shoulder,x3,y0,'crease');
-  seg(x3,y1,x3,y1+tab,'crease');
-  // The long panel has a fold edge against the central panel.
-  seg(x1,y0,x1,y1,'crease');
-  seg(x2,y0,x2,y1,'crease');
-  // Upper/lower wing edges are cut; avoid duplicating scored base edges.
-  seg(x1-W*.5,y0,x1,y0,'cut');
-  seg(x1-W*.5,y1,x1,y1,'cut');
-  seg(x1,y0,x2,y0,'cut');
-  seg(x1,y1,x2,y1,'cut');
-  const maxX=x4,maxY=y1+H;
+  const seg=(x1,y1,x2,y2,kind='cut')=>{if(Math.hypot(x2-x1,y2-y1)>1e-6)lines.push(S(x1,y1,x2,y2,kind));};
+  const poly=(p,kind='cut')=>{for(let i=1;i<p.length;i++)seg(p[i-1][0],p[i-1][1],p[i][0],p[i][1],kind);};
+  const a=0,b=H,c=H+L,d=c+W*.42,e=d+Math.min(G*.35,W*.14);
+  const t=H,bt=t+W,high=H,low=W*.40,offset=W*.50;
+  // Contiguous perimeter of the flat reference, retaining angled side panels.
+  poly([[a,t],[b-offset,t],[b-offset,t-high],[b,t-high],[c,t-low],[e,t-low],[e,t],[d,t],[d,bt],[e,bt],[e,bt+low],[c,bt+low],[b,bt+high],[b-offset,bt+high],[b-offset,bt],[a,bt],[a,t]]);
+  // Scoring is distinct from the cut perimeter: base and side panel hinges.
+  seg(b,t,b,bt,'crease');
+  seg(c,t,c,bt,'crease');
+  seg(b,t,c,t,'crease');
+  seg(b,bt,c,bt,'crease');
+  seg(c,t-low,c,t,'crease');
+  seg(c,bt,c,bt+low,'crease');
+  seg(d,t-low,d,t,'crease');
+  seg(d,bt,d,bt+low,'crease');
+  seg(d,t,d,bt,'crease');
+  // Upper and lower wing-to-wall folds.
+  seg(b-offset,t,b,t,'cut');
+  seg(b-offset,bt,b,bt,'cut');
+  label.push({x:(b+c)/2,y:(t+bt)/2,text:'BASE'});
+  const maxX=e,maxY=bt+high;
   if(maxX>4900||maxY>4900)throw Error('المخطط كبير على تنسيق PDF الحالي.');
-  label.push({x:(x1+x2)/2,y:(y0+y1)/2,text:'BASE'});
-  return {L,W,H,G,slot,thickness,template,lines,curves,label,width:maxX,height:maxY,bodyY:y0,bodyEnd:y1};
+  return {L,W,H,G,slot,thickness,template,lines,curves,label,width:maxX,height:maxY,bodyY:t,bodyEnd:bt};
  }
  const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs[xs.length-1]+w));
  const lines=[],curves=[],label=[];
