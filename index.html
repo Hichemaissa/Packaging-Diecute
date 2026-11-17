@@ -275,7 +275,7 @@ $('pdf').addEventListener('click',()=>{
 
 const model=$('assemblyModel'),shapes=$('assemblyShapes'),stepInput=$('assemblyStep'),status=$('assemblyStatus');
 const V=(x,y,z)=>[x,y,z],add=(a,b)=>a.map((v,i)=>v+b[i]),scale=(a,t)=>a.map(v=>v*t);
-const state={yaw:-.62,pitch:.62,drag:false,x:0,y:0,raf:0,playing:null,opened:false};
+const state={yaw:-.75,pitch:.52,drag:false,x:0,y:0,raf:0,playing:null,opened:false};
 const fold={walls:0,glue:0,bottom:0,top:0},target={...fold};
 const stageNames=['الفردة المسطحة','طي الجوانب','إغلاق لسان اللصق','طي القاعدة','إغلاق الغطاء'];
 const displayStageNames=['الفردة المسطحة','رفع الجانبين المائلين','رفع الحافة الأمامية','رفع اللوحة الخلفية','Présentoir مفتوح من الأعلى'];
@@ -286,40 +286,39 @@ function buildAssembly(){
  const face=(points,color)=>faces.push({points,color});
  const x0=-L/2,x1=L/2,y0=-H/2,y1=H/2,z0=-W/2,z1=W/2;
  if(geometry.template==='display'){
-  // Foldable display panels. Each wall is hinged to one edge of the shared base.
-  // The trapezoidal side cheeks use the same H and L/2 profile as the dieline.
-  const lip=L/2, sideAngle=clamp(fold.walls,0,1)*Math.PI/2;
+  // Reference PDF: the tall advertising panel is LEFT of the base,
+  // the short front lip is RIGHT, and the two sloped cheeks are ABOVE/BELOW.
+  // Map these four flat hinges to actual 3D box edges (not mirrored axes).
+  const lip=L/2;
+  const sideAngle=clamp(fold.walls,0,1)*Math.PI/2;
   const frontAngle=clamp(fold.glue,0,1)*Math.PI/2;
   const backAngle=clamp(fold.bottom,0,1)*Math.PI/2;
-  const s=Math.sin(sideAngle),cs=Math.cos(sideAngle);
+  const ss=Math.sin(sideAngle),cs=Math.cos(sideAngle);
   const sf=Math.sin(frontAngle),cf=Math.cos(frontAngle);
   const sb=Math.sin(backAngle),cb=Math.cos(backAngle);
-  face([V(x0,y0,z0),V(x1,y0,z0),V(x1,y0,z1),V(x0,y0,z1)],'#c99862');
-  // The left and right side panels have a diagonal top edge, not rectangular walls.
+  const baseColor='#cb426d';
+  face([V(x0,y0,z0),V(x1,y0,z0),V(x1,y0,z1),V(x0,y0,z1)],baseColor);
+  // Both trapezoidal side walls hinge along the DEPTH edges of the base.
+  // The tall end meets the tall back panel at x0; the low end meets the lip at x1.
   for(const dir of [-1,1]){
-   const x=dir<0?x0:x1;
-   const hinge=(z,h)=>V(x+dir*h*cs,y0+h*s,z);
-   face([V(x,y0,z0),V(x,y0,z1),hinge(z1,lip),hinge(z0,H)],
-    dir<0?'#eac393':'#d3a16e');
+   const z=dir<0?z0:z1;
+   const cheek=(x,h)=>V(x,y0+h*ss,z+dir*h*cs);
+   face([V(x0,y0,z),V(x1,y0,z),cheek(x1,lip),cheek(x0,H)],
+        dir<0?'#e6c7a0':'#d9b48b');
+   // Small closing tab on the low end of each cheek. At the folded
+   // position it turns INWARD towards the front lip, not outwards.
+   const tabWidth=Math.min(W/2,W*.49), tabHeight=lip;
+   const start=cheek(x1,0),end=cheek(x1,tabHeight);
+   const tx=tabWidth*(1-ss);
+   const dz=-dir*tabWidth*ss;
+   face([start,end,add(end,V(tx,0,dz)),add(start,V(tx,0,dz))],
+        dir<0?'#c6a17a':'#c49d73');
   }
-  // Two attachment tabs from the original PDF, hinged to the outer
-  // vertical edges of the sloped side cheeks (one on each side).
-  // They remain visible at the flat stage and rotate with their parent cheek.
-  const tabDepth=Math.min(W/2,L/2),tabHeight=Math.min(L/2,H/2);
-  for(const dir of [-1,1]){
-   const x=dir<0?x0:x1;
-   const cheek=(z,h)=>V(x+dir*h*cs,y0+h*s,z);
-   const tabZ=dir<0?z0:z1;
-   const outerZ=tabZ+dir*tabDepth;
-   face([cheek(tabZ,0),cheek(tabZ,tabHeight),
-         cheek(outerZ,tabHeight),cheek(outerZ,0)],
-        dir<0?'#bd8b5e':'#c99566');
-  }
-  // The short front lip and tall back advertising panel fold independently.
-  face([V(x0,y0,z1),V(x1,y0,z1),
-        V(x1,y0+lip*sf,z1+lip*cf),V(x0,y0+lip*sf,z1+lip*cf)],'#e2b67f');
-  face([V(x1,y0,z0),V(x0,y0,z0),
-        V(x0,y0+H*sb,z0-H*cb),V(x1,y0+H*sb,z0-H*cb)],'#dcb17e');
+  // Rear tall panel hinges along x0; front lip hinges along x1.
+  face([V(x0,y0,z1),V(x0,y0,z0),
+        V(x0-H*cb,y0+H*sb,z0),V(x0-H*cb,y0+H*sb,z1)],'#e5c8a1');
+  face([V(x1,y0,z0),V(x1,y0,z1),
+        V(x1+lip*cf,y0+lip*sf,z1),V(x1+lip*cf,y0+lip*sf,z0)],'#d9b183');
   return faces;
  }
  const closed=clamp(fold.walls,0,1);
@@ -514,7 +513,7 @@ function stopPlayback(){if(state.playing!==null){clearInterval(state.playing);st
 function assemblyDims(){renderStage();try{drawAssembly()}catch(err){console.error('3D redraw:',err);status.textContent='تعذر رسم معاينة 3D: '+err.message;}}
 $('assemblyZoom').addEventListener('input',()=>{try{drawAssembly()}catch(e){console.error(e)}});
 stepInput.addEventListener('input',()=>{stopPlayback();state.opened=false;renderStage()});
-$('assemblyReset').addEventListener('click',()=>{stopPlayback();state.opened=false;stepInput.value=0;state.yaw=-.62;state.pitch=.62;renderStage()});
+$('assemblyReset').addEventListener('click',()=>{stopPlayback();state.opened=false;stepInput.value=0;state.yaw=-.75;state.pitch=.52;renderStage()});
 $('openBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=true;renderStage()});
 $('closeBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=false;renderStage()});
 $('assemblyPlay').addEventListener('click',()=>{
