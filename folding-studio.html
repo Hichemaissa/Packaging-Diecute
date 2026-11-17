@@ -4,7 +4,11 @@
 <header><strong>L'Ouest Packaging · Folding Studio</strong> — experimental folding mechanics</header><main><div id="stage"><div id="message">Drag to orbit · wheel to zoom</div></div><aside><h3>Parametric folding prototype</h3>
 <label>Length · mm<input id="L" type="number" min="20" max="500" value="160"></label><label>Width · mm<input id="W" type="number" min="20" max="500" value="100"></label><label>Height · mm<input id="H" type="number" min="20" max="500" value="220"></label><label>Board · mm<input id="T" type="number" min=".2" max="8" step=".1" value="1"></label>
 <label>Folding progress · <output id="percent">100%</output><input id="fold" type="range" min="0" max="100" value="100"></label><button id="play">▶ Animate folding</button><button id="reset">Reset camera</button><small>Experimental five-panel open-top carton. This is a mechanical visualization, not a validated dieline, FEFCO construction, or production-ready crease allowance. Existing SVG diecut calculations are unchanged.</small></aside></main>
-<script type="module">
+<script>
+window.addEventListener('error',function(e){const m=document.getElementById('message');if(m)m.textContent='3D loading error: '+(e.message||'Check browser or internet connection');});
+window.addEventListener('unhandledrejection',function(e){const m=document.getElementById('message');if(m)m.textContent='3D module unavailable. Try Chrome and refresh.';});
+setTimeout(function(){if(!window.__foldingStudioReady){const m=document.getElementById('message');if(m)m.textContent='3D did not initialize. External Three.js modules may be blocked or WebGL unsupported.';}},12000);
+</script><script type="module">
 import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const $=id=>document.getElementById(id),stage=$('stage'),scene=new THREE.Scene();scene.background=new THREE.Color(0x192633);
 const camera=new THREE.PerspectiveCamera(36,1,.1,5000);camera.position.set(420,330,500);
@@ -30,5 +34,5 @@ function applyFold(){const f=+$('fold').value/100,a=f*Math.PI/2;$('percent').tex
 ['L','W','H','T'].forEach(id=>$(id).addEventListener('change',rebuild));$('fold').addEventListener('input',applyFold);
 $('play').addEventListener('click',()=>{if(timer){cancelAnimationFrame(timer);timer=null;$('play').textContent='▶ Animate folding';return}let start=performance.now();const step=now=>{const f=Math.min(1,(now-start)/2200);$('fold').value=Math.round(f*100);applyFold();if(f<1)timer=requestAnimationFrame(step);else{timer=null;$('play').textContent='▶ Animate folding'}};$('fold').value=0;applyFold();$('play').textContent='⏸ Stop';timer=requestAnimationFrame(step)});
 $('reset').addEventListener('click',()=>{camera.position.set(420,330,500);orbit.target.set(0,0,0);orbit.update()});
-function resize(){const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h,false)}new ResizeObserver(resize).observe(stage);resize();rebuild();renderer.setAnimationLoop(()=>{if(document.hidden)return;orbit.update();renderer.render(scene,camera)});
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h,false)}new ResizeObserver(resize).observe(stage);resize();rebuild();window.__foldingStudioReady=true;renderer.setAnimationLoop(()=>{if(document.hidden)return;orbit.update();renderer.render(scene,camera)});
 </script></body></html>
