@@ -50,7 +50,7 @@ main{max-width:1380px;margin:auto;padding:26px 20px 48px}.intro{display:flex;jus
 <div class="intro"><div><h2>حوّل المقاسات إلى Diecut جاهز للتصدير</h2><p>أدخل الأبعاد بالميليمتر، شاهد المخطط، وحمّل ملف PDF متجهي بالحجم الحقيقي.</p></div><span class="pill">● يعمل حتى بلا إنترنت</span></div>
 <div class="layout">
 <aside class="panel"><div class="phead"><h3>⚙️ إعدادات العلبة</h3><span class="small muted">الأبعاد mm</span></div><div class="pbody">
-<div class="group"><p class="group-title">نوع العلبة</p><div class="templates"><button id="t-rsc" type="button" class="template" aria-pressed="false"><span class="ticon">📦</span><span><strong>علبة شحن RSC 0201</strong><small>4 واجهات + لسان لصق + ألسنة إغلاق علوية وسفلية</small></span></button><button id="t-tuck" type="button" class="template active" aria-pressed="true"><span class="ticon">🎁</span><span><strong>علبة Tuck End حسب مرجع PDF</strong><small>علبة عطر أو منتج مع ألسنة طي وإغلاق</small></span></button></div></div>
+<div class="group"><p class="group-title">نوع العلبة</p><div class="templates"><button id="t-rsc" type="button" class="template" aria-pressed="false"><span class="ticon">📦</span><span><strong>علبة شحن RSC 0201</strong><small>4 واجهات + لسان لصق + ألسنة إغلاق علوية وسفلية</small></span></button><button id="t-display" type="button" class="template" aria-pressed="false"><span class="ticon">🛍️</span><span><strong>Présentoir de comptoir</strong><small>عرض 200 · عمق 150 · ارتفاع 250 مم</small></span></button><button id="t-tuck" type="button" class="template active" aria-pressed="true"><span class="ticon">🎁</span><span><strong>علبة Tuck End حسب مرجع PDF</strong><small>علبة عطر أو منتج مع ألسنة طي وإغلاق</small></span></button></div></div>
 <div class="group"><p class="group-title">المقاسات الداخلية الاسمية</p><div class="fields"><div class="field"><label for="length">الطول (L)</label><div class="input-wrap"><input id="length" type="number" min="10" max="1000" value="160" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="width">العرض (W)</label><div class="input-wrap"><input id="width" type="number" min="10" max="1000" value="100" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="height">الارتفاع (H)</label><div class="input-wrap"><input id="height" type="number" min="10" max="1200" value="220" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field"><label for="glue">لسان اللصق</label><div class="input-wrap"><input id="glue" type="number" min="6" max="60" value="18" step="1" inputmode="decimal"><span>mm</span></div></div><div class="field full"><label for="thickness">سماكة الكرتون · B Flute (افتراضياً)</label><div class="input-wrap"><input id="thickness" type="number" min="0.5" max="15" value="3" step="0.1" inputmode="decimal"><span>mm</span></div><div class="field-note">سماكة اسمية 3 مم. أدخل السماكة المقاسة عند الإنتاج؛ تعويضات الطي تحتاج معايرة على الكرتون الحقيقي.</div></div><div class="field full"><label for="slot">فراغ الشقوق بين ألسنة الإغلاق (RSC)</label><div class="input-wrap"><input id="slot" type="number" min="0" max="12" value="3" step="0.5" inputmode="decimal"><span>mm</span></div><div class="field-note">يُطبق على قالب RSC فقط</div></div></div></div>
 <div id="error" class="error" role="alert"></div>
 <div class="group"><button type="button" id="generate" class="action primary" style="width:100%">↻ تحديث المخطط</button></div>
@@ -71,6 +71,19 @@ function S(x1,y1,x2,y2,kind='cut'){return {x1,y1,x2,y2,kind};}
 function create(){
  const L=+$('length').value,W=+$('width').value,H=+$('height').value,G=+$('glue').value,slot=+$('slot').value,thickness=+$('thickness').value;
  if(![L,W,H,G,slot,thickness].every(Number.isFinite)||thickness<0.5||thickness>15||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
+ if(template==='display'){
+ const front=Math.min(60,H*.5),tab=Math.min(20,Math.max(12,W*.12)),lines=[],curves=[],label=[];
+ const add=(a,b,c,d,k='cut')=>lines.push(S(a,b,c,d,k));
+ const poly=(p,k='cut')=>{for(let i=1;i<p.length;i++)add(...p[i-1],...p[i],k)};
+ // Base (L x W) and integral front/back walls. Side walls taper towards the front.
+ const x=H,y=H, x2=x+L, y2=y+W;
+ poly([[x,y-front],[x2,y-front],[x2,y],[x2+H,y],[x2+H,y2],[x2,y2],[x2,y2+H],[x,y2+H],[x,y2],[0,y2],[0,y],[x,y],[x,y-front]]);
+ add(x,y,x2,y,'crease');add(x,y2,x2,y2,'crease');add(x,y,x,y2,'crease');add(x2,y,x2,y2,'crease');
+ // Sloped top edges: cut through unused side-wing material; visible cut boundaries are trapezoids.
+ // Manufacturing note: slots and glue-tabs are not yet engineered.
+ label.push({x:x+L/2,y:y+W/2,text:'BASE'},{x:x+L/2,y:y-front/2,text:'FRONT'},{x:x+L/2,y:y2+H/2,text:'BACK'});
+ return {L,W,H,G,slot,thickness,template,lines,curves,label,width:L+2*H,height:2*H+W,bodyY:y,bodyEnd:y2};
+}
  const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs[xs.length-1]+w));
  const lines=[],curves=[],label=[];
  const add=(x1,y1,x2,y2,kind='cut')=>{if(Math.hypot(x2-x1,y2-y1)>0.00001)lines.push(S(x1,y1,x2,y2,kind));};
@@ -141,8 +154,8 @@ function makeSvg(g,includeLabels=true){
  g.label.forEach(o=>{head+=`<text x="${fmt(o.x+pad)}" y="${fmt(o.y+pad)}">${o.text}</text>`});head+='</g>'}
  return head+'</svg>';
 }
-function setTemplate(t){template=t;for(let k of ['rsc','tuck']){$('t-'+k).classList.toggle('active',k===t);$('t-'+k).setAttribute('aria-pressed',String(k===t));}
- $('templateDesc').textContent=t==='rsc'?'RSC 0201 · Regular Slotted Container':'Tuck End · Reference dieline · Fix 05';
+function setTemplate(t){template=t;for(let k of ['rsc','tuck','display']){$('t-'+k).classList.toggle('active',k===t);$('t-'+k).setAttribute('aria-pressed',String(k===t));}
+ $('templateDesc').textContent=t==='rsc'?'RSC 0201 · Regular Slotted Container':t==='display'?'Counter Display · Experimental net':'Tuck End · Reference dieline · Fix 05';
  if(typeof stopPlayback==='function')stopPlayback();
  update();}
 function update(){try{geometry=create();$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('error').style.display='none';$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';try{assemblyDims(geometry)}catch(err){console.error('3D preview failed:',err);$('assemblyStatus').textContent='تعذر عرض 3D؛ مخطط 2D متاح';}}
@@ -171,7 +184,7 @@ function makePdf(g){
  cut.forEach(l=>cmds.push(`${x(l.x1)} ${y(l.y1)} m ${x(l.x2)} ${y(l.y2)} l S`)); (g.curves||[]).filter(c=>c.kind==='cut').forEach(c=>cmds.push(`${x(c.x1)} ${y(c.y1)} m ${x(c.cx1)} ${y(c.cy1)} ${x(c.cx2)} ${y(c.cy2)} ${x(c.x2)} ${y(c.y2)} c S`));
  cmds.push('0.08 0.60 0.39 RG','0.47 w','[] 0 d');
  fold.forEach(l=>cmds.push(`${x(l.x1)} ${y(l.y1)} m ${x(l.x2)} ${y(l.y2)} l S`));
- cmds.push('[] 0 d','0.21 0.34 0.43 rg','BT','/F1 11 Tf',`${fmt(mm2pt(margin))} ${fmt(pgH-mm2pt(14))} Td`,`(L'Ouest Packaging | ${g.template==='rsc'?'RSC 0201':'TUCK CONCEPT'} | ${g.L} x ${g.W} x ${g.H} mm) Tj`,'ET');
+ cmds.push('[] 0 d','0.21 0.34 0.43 rg','BT','/F1 11 Tf',`${fmt(mm2pt(margin))} ${fmt(pgH-mm2pt(14))} Td`,`(L'Ouest Packaging | ${g.template==='rsc'?'RSC 0201':g.template==='display'?'COUNTER DISPLAY CONCEPT':'TUCK CONCEPT'} | ${g.L} x ${g.W} x ${g.H} mm) Tj`,'ET');
  cmds.push('BT','/F1 8 Tf',`${fmt(mm2pt(margin))} ${fmt(mm2pt(8))} Td`,'(RED CUT | GREEN SOLID CREASE | SCALE 1:1 - PRINT AT 100%) Tj','ET','Q');
  const stream=cmds.join('\n')+'\n';
  const objects=[
@@ -193,6 +206,7 @@ function makePdf(g){
 const safeName=g=>`LOuest_${g.template.toUpperCase()}_${g.L}x${g.W}x${g.H}`;
 $('t-rsc').addEventListener('click',()=>setTemplate('rsc'));
 $('t-tuck').addEventListener('click',()=>setTemplate('tuck'));
+$('t-display').addEventListener('click',()=>{$('length').value=200;$('width').value=150;$('height').value=250;$('thickness').value=1.5;setTemplate('display')});
 $('generate').addEventListener('click',update);
 ['length','width','height','glue','slot','thickness'].forEach(id=>$(id).addEventListener('input',update));
 $('svg').addEventListener('click',()=>{update();if(geometry)download(new Blob([makeSvg(geometry,false)],{type:'image/svg+xml;charset=utf-8'}),safeName(geometry)+'.svg')});
@@ -222,10 +236,19 @@ function buildAssembly(){
  const {L,W,H,G}=geometry,faces=[];
  const face=(points,color)=>faces.push({points,color});
  const x0=-L/2,x1=L/2,y0=-H/2,y1=H/2,z0=-W/2,z1=W/2;
- const closed=clamp(fold.walls,0,1);
+ const closed=geometry.template==='display'?1:clamp(fold.walls,0,1);
  // Construct the fully closed tube using shared, exact corner coordinates.
  // This prevents gaps caused by accumulated rotation and floating-point drift.
  if(closed>.999){
+  if(geometry.template==='display'){
+   const front=Math.min(60,H*.5);
+   face([V(x0,y0,z1),V(x1,y0,z1),V(x1,y0,z0),V(x0,y0,z0)],'#e7bd89');
+   face([V(x0,y0,z1),V(x1,y0,z1),V(x1,y0+front,z1),V(x0,y0+front,z1)],'#dba873');
+   face([V(x1,y0,z0),V(x0,y0,z0),V(x0,y0+H,z0),V(x1,y0+H,z0)],'#e8c797');
+   face([V(x0,y0,z1),V(x0,y0,z0),V(x0,y0+H,z0),V(x0,y0+front,z1)],'#d4a16c');
+   face([V(x1,y0,z0),V(x1,y0,z1),V(x1,y0+front,z1),V(x1,y0+H,z0)],'#e1b481');
+   return faces;
+  }
   face([V(x0,y0,z1),V(x1,y0,z1),V(x1,y1,z1),V(x0,y1,z1)],'#dcb17e');
   face([V(x1,y0,z1),V(x1,y0,z0),V(x1,y1,z0),V(x1,y1,z1)],'#e8c18e');
   face([V(x1,y0,z0),V(x0,y0,z0),V(x0,y1,z0),V(x1,y1,z0)],'#d3a16e');
