@@ -181,12 +181,17 @@ function setTemplate(t){template=t;for(let k of ['rsc','tuck','display']){$('t-'
 function update(){try{geometry=create();$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('error').style.display='none';$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';try{assemblyDims(geometry)}catch(err){console.error('3D preview failed:',err);$('assemblyStatus').textContent='تعذر عرض 3D؛ مخطط 2D متاح';}}
 catch(e){geometry=null;$('error').textContent=e.message;$('error').style.display='block';$('netW').textContent=$('netH').textContent=$('area').textContent='—';}}
 function download(blob,filename){
+ if(!blob || !blob.size)throw Error('ملف التصدير فارغ');
  const url=URL.createObjectURL(blob);
  const a=document.createElement('a');
  a.href=url;a.download=filename;a.style.display='none';
  document.body.appendChild(a);
  a.click();
- setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},60000);
+ // Keep a visible manual download link for mobile browsers that block scripted downloads.
+ let fallback=document.getElementById('manualDownload');
+ if(!fallback){fallback=document.createElement('a');fallback.id='manualDownload';fallback.style.cssText='display:block;margin-top:12px;color:#0b5d9b;font-weight:700;text-decoration:underline';$('pdf').closest('.pbody').appendChild(fallback);}
+ fallback.href=url;fallback.download=filename;fallback.textContent='إذا لم يبدأ التنزيل، اضغط هنا لتحميل '+filename;
+ setTimeout(()=>{a.remove();if(fallback.href===url){fallback.removeAttribute('href');fallback.textContent='انتهت صلاحية رابط التحميل؛ اضغط زر التصدير مجدداً';}URL.revokeObjectURL(url);},120000);
  return url;
 }
 function pdfNotice(message,isError=false){
@@ -474,8 +479,7 @@ fold.walls=1;fold.glue=1;fold.bottom=1;fold.top=1;
 target.walls=1;target.glue=1;target.bottom=1;target.top=1;
 stepInput.value=4;
 state.opened=false;
-setTemplate('tuck');
-renderStage();
+try{setTemplate('tuck');renderStage();}catch(e){console.error('Startup error',e);const el=document.getElementById('error');if(el){el.textContent='خطأ أثناء تشغيل المحاكي: '+e.message;el.style.display='block';}}
 })();
 </script>
 </body>
