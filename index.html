@@ -278,7 +278,7 @@ const V=(x,y,z)=>[x,y,z],add=(a,b)=>a.map((v,i)=>v+b[i]),scale=(a,t)=>a.map(v=>v
 const state={yaw:-.75,pitch:.52,drag:false,x:0,y:0,raf:0,playing:null,opened:false};
 const fold={walls:0,glue:0,bottom:0,top:0},target={...fold};
 const stageNames=['الفردة المسطحة','طي الجوانب','إغلاق لسان اللصق','طي القاعدة','إغلاق الغطاء'];
-const displayStageNames=['الفردة المسطحة','رفع الجانبين المائلين','رفع الحافة الأمامية','رفع اللوحة الخلفية','Présentoir مفتوح من الأعلى'];
+const displayStageNames=['الفردة المسطحة','رفع الجانبين المائلين','رفع الحافة الأمامية','رفع اللوحة الخلفية','طي الألسنة الجانبية نحو الداخل'];
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 function buildAssembly(){
  if(!geometry)return [];
@@ -309,8 +309,12 @@ function buildAssembly(){
    // position it turns INWARD towards the front lip, not outwards.
    const tabWidth=Math.min(W/2,W*.49), tabHeight=lip;
    const start=cheek(x1,0),end=cheek(x1,tabHeight);
-   const tx=tabWidth*(1-ss);
-   const dz=-dir*tabWidth*ss;
+   // The tab is hinged independently around the cheek's short vertical edge.
+   // Raising the side cheek must NOT automatically tuck its tab inward.
+   // Stage 4 rotates the tab 90 degrees towards the front lip.
+   const tabAngle=clamp(fold.top,0,1)*Math.PI/2;
+   const tx=tabWidth*Math.cos(tabAngle);
+   const dz=-dir*tabWidth*Math.sin(tabAngle)*ss;
    face([start,end,add(end,V(tx,0,dz)),add(start,V(tx,0,dz))],
         dir<0?'#c6a17a':'#c49d73');
   }
@@ -504,7 +508,7 @@ function animateAssembly(){
 function renderStage(){
  const step=clamp(Number(stepInput.value)||0,0,4);
  target.walls=step>=1?1:0;target.glue=step>=2?1:0;
- target.bottom=step>=3?1:0;target.top=geometry&&geometry.template==='display'?0:(step>=4&&!state.opened?1:0);
+ target.bottom=step>=3?1:0;target.top=geometry&&geometry.template==='display'?(step>=4?1:0):(step>=4&&!state.opened?1:0);
  status.textContent=step+'/4 — '+(geometry&&geometry.template==='display'?displayStageNames[step]:stageNames[step])+(geometry&&geometry.template==='display'?'؛ نموذج طي بصري يحتاج تحققًا من الألسنة.':(state.opened?' — الغطاء مفتوح':'')+'؛ اسحب لتدوير العلبة.');
  $('assemblyPlay').textContent=state.playing!==null?'⏸ إيقاف':'▶ تشغيل التجميع';
  animateAssembly();
@@ -514,7 +518,7 @@ function assemblyDims(){renderStage();try{drawAssembly()}catch(err){console.erro
 $('assemblyZoom').addEventListener('input',()=>{try{drawAssembly()}catch(e){console.error(e)}});
 stepInput.addEventListener('input',()=>{stopPlayback();state.opened=false;renderStage()});
 $('assemblyReset').addEventListener('click',()=>{stopPlayback();state.opened=false;stepInput.value=0;state.yaw=-.75;state.pitch=.52;renderStage()});
-$('openBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=true;renderStage()});
+$('openBox').addEventListener('click',()=>{stopPlayback();stepInput.value=geometry&&geometry.template==='display'?3:4;state.opened=true;renderStage()});
 $('closeBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=false;renderStage()});
 $('assemblyPlay').addEventListener('click',()=>{
  if(!geometry)return;
