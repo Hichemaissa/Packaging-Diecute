@@ -143,6 +143,7 @@ function makeSvg(g,includeLabels=true){
 }
 function setTemplate(t){template=t;for(let k of ['rsc','tuck']){$('t-'+k).classList.toggle('active',k===t);$('t-'+k).setAttribute('aria-pressed',String(k===t));}
  $('templateDesc').textContent=t==='rsc'?'RSC 0201 · Regular Slotted Container':'Tuck End · Reference dieline · Fix 05';
+ if(typeof stopPlayback==='function')stopPlayback();
  update();}
 function update(){try{geometry=create();$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('error').style.display='none';$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';try{assemblyDims(geometry)}catch(err){console.error('3D preview failed:',err);$('assemblyStatus').textContent='تعذر عرض 3D؛ مخطط 2D متاح';}}
 catch(e){geometry=null;$('error').textContent=e.message;$('error').style.display='block';$('netW').textContent=$('netH').textContent=$('area').textContent='—';}}
@@ -410,14 +411,14 @@ function renderStage(){
  animateAssembly();
 }
 function stopPlayback(){if(state.playing!==null){clearInterval(state.playing);state.playing=null;}}
-function assemblyDims(){renderStage();}
+function assemblyDims(){renderStage();try{drawAssembly()}catch(err){console.error('3D redraw:',err);status.textContent='تعذر رسم معاينة 3D: '+err.message;}}
 $('assemblyZoom').addEventListener('input',()=>{try{drawAssembly()}catch(e){console.error(e)}});
 stepInput.addEventListener('input',()=>{stopPlayback();state.opened=false;renderStage()});
 $('assemblyReset').addEventListener('click',()=>{stopPlayback();state.opened=false;stepInput.value=0;state.yaw=-.62;state.pitch=-.38;renderStage()});
 $('openBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=true;renderStage()});
 $('closeBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=false;renderStage()});
 $('assemblyPlay').addEventListener('click',()=>{
- if(geometry?.template!=='tuck')return;
+ if(!geometry)return;
  if(state.playing!==null){stopPlayback();renderStage();return}
  if(Number(stepInput.value)>=4)stepInput.value=0;
  state.opened=false;renderStage();
