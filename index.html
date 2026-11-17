@@ -139,7 +139,20 @@ function setTemplate(t){template=t;for(let k of ['rsc','tuck']){$('t-'+k).classL
  update();}
 function update(){try{geometry=create();$('preview').outerHTML=makeSvg(geometry,true).replace('<svg ','<svg id="preview" ');$('error').style.display='none';$('netW').textContent=fmt(geometry.width)+' mm';$('netH').textContent=fmt(geometry.height)+' mm';$('area').textContent=fmt(geometry.width*geometry.height/1e6)+' m²';try{assemblyDims(geometry)}catch(err){console.error('3D preview failed:',err);$('assemblyStatus').textContent='تعذر عرض 3D؛ مخطط 2D متاح';}}
 catch(e){geometry=null;$('error').textContent=e.message;$('error').style.display='block';$('netW').textContent=$('netH').textContent=$('area').textContent='—';}}
-function download(blob,filename){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
+function download(blob,filename){
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;a.download=filename;a.style.display='none';
+ document.body.appendChild(a);
+ a.click();
+ setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},60000);
+ return url;
+}
+function pdfNotice(message,isError=false){
+ let el=document.getElementById('pdfNotice');
+ if(!el){el=document.createElement('p');el.id='pdfNotice';el.style.cssText='margin:10px 0;font-size:14px;line-height:1.7';$('pdf').parentElement.insertAdjacentElement('afterend',el);}
+ el.style.color=isError?'#b42318':'#17653b';el.textContent=message;
+}
 const mm2pt=n=>n*72/25.4;
 function makePdf(g){
  // Minimal, self-contained valid PDF: native vector cut and crease strokes at precisely 72/25.4 pt per mm.
@@ -175,7 +188,16 @@ $('t-tuck').addEventListener('click',()=>setTemplate('tuck'));
 $('generate').addEventListener('click',update);
 ['length','width','height','glue','slot'].forEach(id=>$(id).addEventListener('input',update));
 $('svg').addEventListener('click',()=>{update();if(geometry)download(new Blob([makeSvg(geometry,false)],{type:'image/svg+xml;charset=utf-8'}),safeName(geometry)+'.svg')});
-$('pdf').addEventListener('click',()=>{update();if(geometry)download(makePdf(geometry),safeName(geometry)+'.pdf')});
+$('pdf').addEventListener('click',()=>{
+ try{
+  update();
+  if(!geometry){pdfNotice('تعذر إنشاء المخطط. تحقق من المقاسات ورسالة الخطأ.',true);return;}
+  const blob=makePdf(geometry);
+  if(!blob||blob.size<100){throw Error('PDF empty');}
+  download(blob,safeName(geometry)+'.pdf');
+  pdfNotice('تم إنشاء ملف PDF. إذا لم يبدأ التنزيل، افتح الموقع في Chrome وتحقق من مجلد التنزيلات.');
+ }catch(err){console.error('PDF export error:',err);pdfNotice('فشل تصدير PDF: '+(err.message||'خطأ غير معروف'),true);}
+});
 
 
 
