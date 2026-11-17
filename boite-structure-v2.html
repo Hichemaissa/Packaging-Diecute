@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>علبة التعليق — إعادة بناء الديكارت | L'Ouest Packaging</title>
+<style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#edf3f7;color:#19384c;font-family:system-ui,Tahoma,Arial,sans-serif}
+header{background:#17384d;color:#fff;padding:18px max(18px,4%);display:flex;gap:15px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+a{color:inherit}main{max-width:1150px;margin:26px auto;padding:0 17px}h1{font-size:25px;margin:8px 0}p{line-height:1.8}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}.card{background:white;border:1px solid #d9e3ea;border-radius:14px;overflow:hidden}
+.card h2{font-size:17px;padding:16px 18px;border-bottom:1px solid #e6ebf0;margin:0}
+#viewer{display:block;width:100%;height:530px;background:radial-gradient(circle at 45% 24%,#fff,#dbe9f1);cursor:grab;touch-action:none}
+.controls{padding:16px 18px}button{background:#09677f;color:#fff;border:0;border-radius:8px;padding:11px 19px;font-weight:700;cursor:pointer;margin-inline-end:8px}
+button.secondary{background:#e1ebf0;color:#1a5068}input[type=range]{width:100%;accent-color:#09677f;margin:15px 0}
+small,.note{color:#5d7585;font-size:13px;line-height:1.9}
+dl{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:16px 0}dt{color:#587081}dd{margin:0;font-weight:650}
+ul{line-height:2;padding-inline-start:24px}
+@media(max-width:850px){.grid{grid-template-columns:1fr}#viewer{height:460px}}
+</style></head>
+<body><header><strong>L'Ouest Packaging | Structural Packaging</strong><a href="./index.html">العودة للموقع الرئيسي</a></header>
+<main><h1>علبة تعليق — إعادة بناء هندسية</h1><p class="note">معاينة هندسية تجريبية مستمدة من خطوط الديكارت <b>boite(1).pdf</b> ومراحل فيديو التجميع. الأبعاد أدناه نسب بوحدات رسم PDF وليست ميليمترات إنتاج معتمدة.</p>
+<div class="grid"><section class="card"><h2>معاينة العلبة — غلق وفتح</h2>
+<svg id="viewer" viewBox="0 0 680 580" role="img" aria-label="معاينة ثلاثية الأبعاد للعلبة مع الغطاء ولوح التعليق المطوي"></svg>
+<div class="controls"><button id="open">فتح</button><button id="close">غلق</button><button id="reset" class="secondary">إعادة الوضع</button>
+<p id="status" aria-live="polite">مغلقة</p><input id="fold" type="range" min="0" max="100" value="0" aria-label="درجة فتح العلبة">
+<small>اسحب المجسم يمينًا ويسارًا لتدويره. حركة اللسان الداخلي والغطاء والألسنة الجانبية منفصلة زمنيًا.</small></div></section>
+<section class="card"><h2>مرجع القص والطي</h2><div style="padding:20px">
+<dl><dt>الواجهة الأولى</dt><dd>255.1</dd><dt>الجانب الأول</dt><dd>170.1</dd>
+<dt>الواجهة الثانية</dt><dd>255.1</dd><dt>الجانب الثاني</dt><dd>168.7</dd>
+<dt>ارتفاع الجسم</dt><dd>425.2</dd><dt>عمق العلبة</dt><dd>≈170</dd>
+<dt>طول الغطاء حتى الثنية</dt><dd>≈165.8</dd><dt>لسان الإدخال</dt><dd>≈34</dd>
+<dt>ارتفاع قاعدة التعليق</dt><dd>≈141.7</dd><dt>جزء التعليق المطوي</dt><dd>≈155.9</dd></dl>
+<ul><li>أربع واجهات: عريضة ثم ضيقة ثم عريضة ثم ضيقة</li>
+<li>لسان الغراء الجانبي ملاصق للواجهة الأولى</li>
+<li>لوح التعليق خلف العلبة مطوي عند الثنية، فتتوافق فتحتي التعليق</li>
+<li>غطاء الإغلاق مفصلي فوق الواجهة المقابلة للوّح الخلفي، وله لسان يدخل إلى الداخل</li>
+<li>الألسنة العلوية الجانبية تطوى قبل الغطاء</li></ul>
+<p class="note">يُعرض القاع مغلقًا. هذه محاكاة شكلية لا تغني عن مراجعة خطوط القص أو اختبار نموذج كرتوني حقيقي قبل الإنتاج.</p>
+</div></section></div></main>
+<script>
+const svg=document.getElementById('viewer'),slider=document.getElementById('fold'),status=document.getElementById('status');
+let yaw=-.54,open=0,drag=null,anim=0;
+const W=170,D=113.4,H=283.4,T=H/2,B=-H/2,F=D/2,R=-D/2,hang=94.5,hangUpper=104,cap=110.5,tuck=22.6;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+function project(p){const [x,y,z]=p,c=Math.cos(yaw),s=Math.sin(yaw),xr=x*c+z*s,zr=z*c-x*s;return [340+xr*1.31,365-y*.99+zr*.46];}
+function depth(p){return p[2]*Math.cos(yaw)-p[0]*Math.sin(yaw);}
+function path(points){return points.map((p,i)=>{let q=project(p);return (i?'L':'M')+q[0].toFixed(2)+' '+q[1].toFixed(2)}).join(' ')+'Z';}
+function face(points,color,holes=[]){let centroid=points.reduce((a,p)=>[a[0]+p[0]/points.length,a[1]+p[1]/points.length,a[2]+p[2]/points.length],[0,0,0]);let d=path(points);for(let h of holes)d+=' '+path(h.slice().reverse());return {depth:depth(centroid),svg:'<path d="'+d+'" fill="'+color+'" fill-rule="evenodd" stroke="#866746" stroke-width="1.5" stroke-linejoin="round"/>'}}
+function hline(a,b){const p=project(a),q=project(b);return '<path d="M'+p.join(' ')+'L'+q.join(' ')+'" stroke="#a98056" stroke-width="1.4" fill="none"/>'}
+function holeAt(z,y){const pts=[]; // two rounded ends and central rounded enlargement
+for(let i=0;i<=48;i++){let a=i/48*2*Math.PI,co=Math.cos(a),si=Math.sin(a);let x=co*(Math.abs(si)<.5?27:25),cy=si*(Math.abs(co)<.46?10:5.3);pts.push([x,y+cy,z]);}return pts;}
+function render(){
+const stage=open, lidAngle=clamp((stage-.11)/.74)*Math.PI*.68;
+const sideAngle=clamp((stage-.48)/.50)*Math.PI*.5;
+const tabRelax=clamp(stage/.20)*.20; // unlock insertion tab before the lid rises
+const faces=[],details=[];
+const add=(p,c,holes)=>faces.push(face(p,c,holes));
+const rect=(x0,x1,y0,y1,z)=>[[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]];
+// Main four walls. Width/depth ratio follows the corrected PDF dieline.
+add(rect(-W/2,W/2,B,T,R),'#d2b08a');
+add([[-W/2,B,R],[-W/2,B,F],[-W/2,T,F],[-W/2,T,R]],'#dfb98b');
+add([[W/2,B,R],[W/2,B,F],[W/2,T,F],[W/2,T,R]],'#d8a97a');
+add(rect(-W/2,W/2,B,T,F),'#f0d1a5');
+// Closed bottom: two full-length wide flaps and short side flaps overlap in the finished package.
+add([[-W/2,B,R],[W/2,B,R],[W/2,B,F],[-W/2,B,F]],'#c59a6f');
+// Back hanging panel first rises from rear wall.
+add(rect(-W/2,W/2,T,T+hang,R-1.4),'#e4c294',[holeAt(R-1.4,T+66)]);
+// The upper panel is physically folded 180 degrees DOWN over the first one.
+// Its hole aligns with the first hole, unlike the old doubly tall hanger.
+add(rect(-W/2,W/2,T+hang-hangUpper,T+hang,R-4),'#efce9f',[holeAt(R-4,T+66)]);
+details.push(hline([-W/2,T+hang,R-5],[W/2,T+hang,R-5]));
+// Top side dust flaps hinge on the two narrow side walls.
+for(let sign of [-1,1]){let x=sign*W/2,ext=85;
+const xt=x-sign*ext*Math.cos(sideAngle),yt=T+ext*Math.sin(sideAngle);
+add([[x,T,R+6],[x,T,F-6],[xt,yt,F-14],[xt,yt,R+14]],'#e6c597')}
+// Main lid is attached to the front wide wall; its hinge is across the top front edge.
+const lidPoint=(x,d)=>[x,T+d*Math.sin(lidAngle),F-d*Math.cos(lidAngle)];
+add([lidPoint(-W/2,0),lidPoint(W/2,0),lidPoint(W/2,cap),lidPoint(-W/2,cap)],'#f8deb5');
+// Insertion tongue folds 90° under the lid at the back side when closed.
+const edge=lidPoint(0,cap),tip=(x,v)=>[x,edge[1]-v*Math.cos(lidAngle+tabRelax),edge[2]-v*Math.sin(lidAngle+tabRelax)];
+add([tip(-W/2+11,0),tip(W/2-11,0),tip(W/2-21,tuck),tip(-W/2+21,tuck)],'#d6a77c');
+faces.sort((a,b)=>a.depth-b.depth);
+svg.innerHTML='<ellipse cx="338" cy="548" rx="160" ry="16" fill="#35546b" opacity=".10"/>'+faces.map(f=>f.svg).join('')+details.join('');
+slider.value=Math.round(open*100);status.textContent=open<.01?'مغلقة':open>.99?'مفتوحة':Math.round(open*100)+'% مفتوحة';
+}
+function set(v){cancelAnimationFrame(anim);open=clamp(v);render()}
+function animate(target){cancelAnimationFrame(anim);const first=open,start=performance.now();function tick(now){const q=clamp((now-start)/1050),ease=q*q*(3-2*q);open=lerp(first,target,ease);render();if(q<1)anim=requestAnimationFrame(tick)}anim=requestAnimationFrame(tick)}
+document.getElementById('open').onclick=()=>animate(1);
+document.getElementById('close').onclick=()=>animate(0);
+document.getElementById('reset').onclick=()=>{yaw=-.54;animate(0)};
+slider.oninput=()=>set(Number(slider.value)/100);
+svg.addEventListener('pointerdown',e=>{drag=e.clientX;svg.setPointerCapture(e.pointerId)});
+svg.addEventListener('pointermove',e=>{if(drag!==null){yaw+=(e.clientX-drag)*.007;drag=e.clientX;render()}});
+svg.addEventListener('pointerup',()=>drag=null);svg.addEventListener('pointercancel',()=>drag=null);
+render();
+</script></body></html>
