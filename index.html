@@ -275,7 +275,7 @@ $('pdf').addEventListener('click',()=>{
 
 const model=$('assemblyModel'),shapes=$('assemblyShapes'),stepInput=$('assemblyStep'),status=$('assemblyStatus');
 const V=(x,y,z)=>[x,y,z],add=(a,b)=>a.map((v,i)=>v+b[i]),scale=(a,t)=>a.map(v=>v*t);
-const state={yaw:-.62,pitch:.38,drag:false,x:0,y:0,raf:0,playing:null,opened:false};
+const state={yaw:-.62,pitch:.62,drag:false,x:0,y:0,raf:0,playing:null,opened:false};
 const fold={walls:0,glue:0,bottom:0,top:0},target={...fold};
 const stageNames=['الفردة المسطحة','طي الجوانب','إغلاق لسان اللصق','طي القاعدة','إغلاق الغطاء'];
 const displayStageNames=['الفردة المسطحة','رفع الجانبين المائلين','رفع الحافة الأمامية','رفع اللوحة الخلفية','Présentoir مفتوح من الأعلى'];
@@ -514,8 +514,8 @@ function stopPlayback(){if(state.playing!==null){clearInterval(state.playing);st
 function assemblyDims(){renderStage();try{drawAssembly()}catch(err){console.error('3D redraw:',err);status.textContent='تعذر رسم معاينة 3D: '+err.message;}}
 $('assemblyZoom').addEventListener('input',()=>{try{drawAssembly()}catch(e){console.error(e)}});
 stepInput.addEventListener('input',()=>{stopPlayback();state.opened=false;renderStage()});
-$('assemblyReset').addEventListener('click',()=>{stopPlayback();state.opened=false;stepInput.value=0;state.yaw=-.62;state.pitch=.38;renderStage()});
-$('openBox').addEventListener('click',()=>{stopPlayback();stepInput.value=geometry&&geometry.template==='display'?0:4;state.opened=true;renderStage()});
+$('assemblyReset').addEventListener('click',()=>{stopPlayback();state.opened=false;stepInput.value=0;state.yaw=-.62;state.pitch=.62;renderStage()});
+$('openBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=true;renderStage()});
 $('closeBox').addEventListener('click',()=>{stopPlayback();stepInput.value=4;state.opened=false;renderStage()});
 $('assemblyPlay').addEventListener('click',()=>{
  if(!geometry)return;
