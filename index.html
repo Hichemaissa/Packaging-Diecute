@@ -107,10 +107,20 @@ function create(){
    {id:'sideA',name:'الجناح المائل الأول',polygon:[[x2,y0],[x3,y1],[x3,y2],[x2,y2]]},
    {id:'sideB',name:'الجناح المائل الثاني',polygon:[[x2,y5],[x3,y4],[x3,y3],[x2,y3]]}
   ];
+  // Inventory from the exact same crease primitives exported in the dieline.
+  const foldEdges=lines.filter(line=>line.kind==='crease').map((line,index)=>({
+   id:'fold-'+(index+1),start:[line.x1,line.y1],end:[line.x2,line.y2],validated3D:false
+  }));
+  // Tab functions remain unverified until a physical fold test.
+  const unresolvedRegions=[
+   {id:'left-extension',bounds:[[x0,y2],[x1,y3]],role:'unverified'},
+   {id:'right-extension',bounds:[[x3,y3],[x5,y4]],role:'unverified'},
+   {id:'upper-extension',bounds:[[x3,y1],[x5,y2]],role:'unverified'}
+  ];
   label.push({x:(x2+x3)/2,y:(y2+y3)/2,text:'BASE'});
   const maxX=Math.max(x4,x5),maxY=y5;
   if(maxX>4900||maxY>4900)throw Error('المخطط كبير على تنسيق PDF الحالي.');
-  return {L,W,H,G,slot,thickness,template,lines,curves,label,panels,width:maxX,height:maxY,bodyY:y2,bodyEnd:y3};
+  return {L,W,H,G,slot,thickness,template,lines,curves,label,panels,foldEdges,unresolvedRegions,width:maxX,height:maxY,bodyY:y2,bodyEnd:y3};
  }
  const widths=[L,W,L,W],xs=[G];widths.forEach(w=>xs.push(xs[xs.length-1]+w));
  const lines=[],curves=[],label=[];
