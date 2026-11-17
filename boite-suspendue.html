@@ -1,0 +1,39 @@
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Boîte à suspendre | L'Ouest Packaging</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#f0f5f8;color:#15384d;font:15px system-ui,Tahoma}header{background:#13374b;color:white;padding:22px 5%;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}header a{color:white}main{max-width:1200px;margin:auto;padding:24px 16px}h1{font-size:24px}.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}.card{background:white;border:1px solid #d6e1e8;border-radius:14px;overflow:hidden}h2{font-size:17px;margin:0;padding:16px;border-bottom:1px solid #e1eaf0}.stage{height:480px;background:radial-gradient(circle at 50% 30%,#fff,#d8e6ef)}#model{width:100%;height:100%;touch-action:none;cursor:grab}.pad{padding:16px}button{background:#086c89;border:0;color:white;padding:12px 20px;border-radius:10px;cursor:pointer;font-weight:bold;margin:0 0 8px 7px}button.alt{background:#dbe9f0;color:#164661}input{width:100%;accent-color:#086c89}.note{font-size:13px;color:#5d7484;line-height:1.9}.cuts{color:#e34b4b}.folds{color:#16965b}.dieline{width:100%;height:auto;max-height:550px;background:#fff}#status{font-weight:bold;color:#086c89}@media(max-width:800px){.grid{grid-template-columns:1fr}.stage{height:390px}}</style>
+<header><strong>L'Ouest Packaging · Boîte à suspendre</strong><a href="./index.html">العودة للموقع الأصلي</a></header>
+<main><h1>العلبة الجديدة — لسان تعليق مزدوج</h1><p class="note">قالب إضافي مبني على ملف boite.pdf. محاكاة الطي توضيحية وتحتاج مطابقة نهائية مع نموذج كرتوني حقيقي؛ المحرك القديم في الصفحة الرئيسية لم يتغير.</p>
+<div class="grid"><section class="card"><h2>فتح وغلق العلبة — معاينة ثلاثية الأبعاد</h2><div class="stage"><svg id="model" viewBox="0 0 600 490" aria-label="مجسم العلبة ثلاثي الأبعاد"></svg></div><div class="pad"><button id="open">فتح</button><button id="close">غلق</button><button class="alt" id="reset">إعادة الوضع</button><p><span id="status">مغلقة</span></p><input id="amount" type="range" min="0" max="100" value="0"><p class="note">اسحب النموذج يمينًا أو يسارًا لتدويره. الألسنة الجانبية والغطاء واللسان الداخلي تتحرك، بينما يبقى لوح التعليق خلف العلبة ثابتًا.</p></div></section>
+<section class="card"><h2>المخطط المسطح — الأحمر قص، الأخضر طي</h2><div class="pad"><svg class="dieline" viewBox="0 0 885 895" aria-label="مخطط العلبة">
+<g stroke="#e34b4b" stroke-width="2" fill="none"><path d="M35 299 L1 313 V711 L35 724 V895 H884 V171 H728 V290 L715 299 V0 H460 V299 L450 299 L446 171 H290 V133 L276 113 H49 L35 133 V299"/><path d="M35 133 H290 M35 895 H884 M35 724 V895 M290 724 V895 M460 724 V895 M715 724 V895"/><path d="M535 105 C519 105 519 82 535 82 H567 Q587 58 600 82 H632 C647 82 647 105 632 105 H600 Q587 123 567 105 Z M535 225 C519 225 519 202 535 202 H567 Q587 178 600 202 H632 C647 202 647 225 632 225 H600 Q587 243 567 225 Z"/></g>
+<g stroke="#13985e" stroke-width="2" fill="none"><path d="M35 299 H884 M35 724 H884 M290 299 V724 M460 299 V724 M715 299 V724 M35 299 V724 M460 171 H715 M35 133 H290"/></g></svg>
+<p class="note"><span class="cuts">■ Cut</span> · <span class="folds">■ Crease</span>. هذا العرض للمعاينة فقط، وليس ملف قص 1:1. استعمل boite.pdf الأصلي للإنتاج بعد التحقق من المقاسات.</p></div></section></div></main>
+<script>
+const model=document.getElementById('model'),range=document.getElementById('amount'),status=document.getElementById('status');let angle=-.58,op=0,drag=null,raf=0;
+const W=170,D=110,H=225;function proj(p){let [x,y,z]=p,c=Math.cos(angle),s=Math.sin(angle),xx=x*c+z*s,zz=z*c-x*s;return [300+xx*1.35,315-y*1.02+zz*.51]}
+function poly(points,color,stroke='#98724a'){return '<polygon points="'+points.map(p=>proj(p).map(v=>v.toFixed(1)).join(',')).join(' ')+'" fill="'+color+'" stroke="'+stroke+'" stroke-width="2" stroke-linejoin="round"/>'}
+function ln(a,b,color='#b38251'){return '<path d="M'+proj(a).join(' ')+'L'+proj(b).join(' ')+'" fill="none" stroke="'+color+'" stroke-width="2"/>'}
+function hole(y){const p=proj([0,y,-D/2-2]);return '<g transform="translate('+p[0]+' '+p[1]+')" fill="#e0eaf0" stroke="#956e42" stroke-width="2"><path d="M-20 -5 H-10 Q0 -18 10 -5 H20 V5 H10 Q0 18 -10 5 H-20 Z"/></g>'}
+function render(){
+const t=op,alpha=t*Math.PI*.58,beta=t*Math.PI*.5;let faces=[];
+const push=(depth,markup)=>faces.push({depth,markup});
+push(-60,poly([[-W/2,-H/2,-D/2],[W/2,-H/2,-D/2],[W/2,H/2,-D/2],[-W/2,H/2,-D/2]],'#d4a979'));
+push(0,poly([[-W/2,-H/2,-D/2],[-W/2,-H/2,D/2],[-W/2,H/2,D/2],[-W/2,H/2,-D/2]],'#e8bc86'));
+push(5,poly([[W/2,-H/2,-D/2],[W/2,-H/2,D/2],[W/2,H/2,D/2],[W/2,H/2,-D/2]],'#dcb07a'));
+push(55,poly([[-W/2,-H/2,D/2],[W/2,-H/2,D/2],[W/2,H/2,D/2],[-W/2,H/2,D/2]],'#edcc9a'));
+push(5,poly([[-W/2,-H/2,-D/2],[W/2,-H/2,-D/2],[W/2,-H/2,D/2],[-W/2,-H/2,D/2]],'#bb8e65'));
+const hangerZ=-D/2-2;
+push(-75,poly([[-W/2,H/2,hangerZ],[W/2,H/2,hangerZ],[W/2,H/2+185,hangerZ],[-W/2,H/2+185,hangerZ]],'#f5d9ab')+ln([-W/2,H/2+92,hangerZ],[W/2,H/2+92,hangerZ])+hole(H/2+48)+hole(H/2+139));
+for(let sign of [-1,1]){let x=sign*W/2,tx=x-sign*D*.43*Math.cos(beta),ty=H/2+D*.43*Math.sin(beta);push(18,poly([[x,H/2,-D/2+5],[x,H/2,D/2-5],[tx,ty,D/2-18],[tx,ty,-D/2+18]],'#ecd2a4'))}
+function c(x,d){return [x,H/2+d*Math.sin(alpha),-D/2+d*Math.cos(alpha)]}
+push(70,poly([c(-W/2,0),c(W/2,0),c(W/2,D),c(-W/2,D)],'#f5dcb7'));
+const end=c(0,D), tab=(x,v)=>[x,end[1]-v*Math.cos(alpha),end[2]+v*Math.sin(alpha)];
+push(75,poly([tab(-W/2+12,0),tab(W/2-12,0),tab(W/2-22,35),tab(-W/2+22,35)],'#dfb683'));
+faces.sort((a,b)=>a.depth-b.depth);
+model.innerHTML='<ellipse cx="300" cy="457" rx="150" ry="16" fill="#35536a" opacity=".12"/>'+faces.map(f=>f.markup).join('');
+range.value=Math.round(op*100);status.textContent=op<.01?'مغلقة':op>.99?'مفتوحة':Math.round(op*100)+'% مفتوحة';
+}
+function set(v){cancelAnimationFrame(raf);op=Math.max(0,Math.min(1,v));render()}
+function animate(target){cancelAnimationFrame(raf);let from=op,start=performance.now();function tick(now){let q=Math.min(1,(now-start)/850);op=from+(target-from)*(q*q*(3-2*q));render();if(q<1)raf=requestAnimationFrame(tick)}raf=requestAnimationFrame(tick)}
+document.getElementById('open').onclick=()=>animate(1);document.getElementById('close').onclick=()=>animate(0);document.getElementById('reset').onclick=()=>{angle=-.58;animate(0)};range.oninput=()=>set(+range.value/100);
+model.onpointerdown=e=>{drag=e.clientX;model.setPointerCapture(e.pointerId)};model.onpointermove=e=>{if(drag!==null){angle+=(e.clientX-drag)*.008;drag=e.clientX;render()}};model.onpointerup=model.onpointercancel=()=>drag=null;render();
+</script></html>
