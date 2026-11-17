@@ -14,7 +14,7 @@ function poly(points,color,stroke='#98724a'){return '<polygon points="'+points.m
 function ln(a,b,color='#b38251'){return '<path d="M'+proj(a).join(' ')+'L'+proj(b).join(' ')+'" fill="none" stroke="'+color+'" stroke-width="2"/>'}
 function hole(y){const p=proj([0,y,-D/2-2]);return '<g transform="translate('+p[0]+' '+p[1]+')" fill="#e0eaf0" stroke="#956e42" stroke-width="2"><path d="M-20 -5 H-10 Q0 -18 10 -5 H20 V5 H10 Q0 18 -10 5 H-20 Z"/></g>'}
 function render(){
-const t=op,alpha=t*Math.PI*.58,beta=t*Math.PI*.5;let faces=[];
+const t=op,alpha=Math.min(1,t/.72)*Math.PI*.58,beta=Math.max(0,Math.min(1,(t-.38)/.62))*Math.PI*.5;let faces=[];
 const push=(depth,markup)=>faces.push({depth,markup});
 push(-60,poly([[-W/2,-H/2,-D/2],[W/2,-H/2,-D/2],[W/2,H/2,-D/2],[-W/2,H/2,-D/2]],'#d4a979'));
 push(0,poly([[-W/2,-H/2,-D/2],[-W/2,-H/2,D/2],[-W/2,H/2,D/2],[-W/2,H/2,-D/2]],'#e8bc86'));
