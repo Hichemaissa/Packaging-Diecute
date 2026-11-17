@@ -73,6 +73,7 @@ function create(){
  if(![L,W,H,G,slot,thickness].every(Number.isFinite)||thickness<0.5||thickness>15||L<10||W<10||H<10||L>1000||W>1000||H>1200||G<6||G>60||slot<0||slot>12)throw Error('رجاءً أدخل مقاسات صحيحة.');
  if(template==='display'){
   if(H<=L/2)throw Error('في قالب Présentoir يجب أن يكون الارتفاع أكبر من نصف الطول لتجنب تداخل خطوط القص.');
+  if(W<L+1)throw Error('في قالب Présentoir هذا يجب أن يكون العرض W أكبر من الطول L بمقدار 1 مم على الأقل، حتى لا تتداخل ألسنة القص.');
   // Exact topology traced from the user-supplied Templatemaker vector PDF.
   // PDF axis: X=0, L, L+W/2, L+W/2+L, etc.; Y=0, H, H+W, H+W+H.
   // L=50, W=60, H=80 reproduces the reference at its native 1:1 size.
@@ -307,7 +308,7 @@ function buildAssembly(){
         dir<0?'#e6c7a0':'#d9b48b');
    // Small closing tab on the low end of each cheek. At the folded
    // position it turns INWARD towards the front lip, not outwards.
-   const tabWidth=Math.min(W/2,W*.49), tabHeight=lip;
+   const tabWidth=W/2, tabHeight=lip;
    const start=cheek(x1,0),end=cheek(x1,tabHeight);
    // The tab is hinged independently around the cheek's short vertical edge.
    // Raising the side cheek must NOT automatically tuck its tab inward.
