@@ -8,9 +8,9 @@
 import * as THREE from 'three';import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 const $=id=>document.getElementById(id),stage=$('stage'),scene=new THREE.Scene();scene.background=new THREE.Color(0x192633);
 const camera=new THREE.PerspectiveCamera(36,1,.1,5000);camera.position.set(420,330,500);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;stage.prepend(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));renderer.shadowMap.enabled=false;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;stage.prepend(renderer.domElement);
 const orbit=new OrbitControls(camera,renderer.domElement);orbit.enableDamping=true;orbit.minDistance=50;orbit.maxDistance=2300;
-scene.add(new THREE.HemisphereLight(0xf2f6ff,0x52616c,1.5));const lamp=new THREE.DirectionalLight(0xffefda,2.1);lamp.position.set(300,550,300);lamp.castShadow=true;lamp.shadow.mapSize.set(2048,2048);lamp.shadow.camera.left=-800;lamp.shadow.camera.right=800;lamp.shadow.camera.top=800;lamp.shadow.camera.bottom=-800;scene.add(lamp);
+scene.add(new THREE.HemisphereLight(0xf2f6ff,0x52616c,1.5));const lamp=new THREE.DirectionalLight(0xffefda,2.1);lamp.position.set(300,550,300);lamp.castShadow=true;lamp.shadow.mapSize.set(512,512);lamp.shadow.camera.left=-800;lamp.shadow.camera.right=800;lamp.shadow.camera.top=800;lamp.shadow.camera.bottom=-800;scene.add(lamp);
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(3000,3000),new THREE.MeshStandardMaterial({color:0x344350,roughness:1}));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
 const group=new THREE.Group();scene.add(group);let hinges=[],timer=null;
 const material=new THREE.MeshPhysicalMaterial({color:0xd8b586,roughness:.82,metalness:0,side:THREE.DoubleSide});
@@ -30,5 +30,5 @@ function applyFold(){const f=+$('fold').value/100,a=f*Math.PI/2;$('percent').tex
 ['L','W','H','T'].forEach(id=>$(id).addEventListener('change',rebuild));$('fold').addEventListener('input',applyFold);
 $('play').addEventListener('click',()=>{if(timer){cancelAnimationFrame(timer);timer=null;$('play').textContent='▶ Animate folding';return}let start=performance.now();const step=now=>{const f=Math.min(1,(now-start)/2200);$('fold').value=Math.round(f*100);applyFold();if(f<1)timer=requestAnimationFrame(step);else{timer=null;$('play').textContent='▶ Animate folding'}};$('fold').value=0;applyFold();$('play').textContent='⏸ Stop';timer=requestAnimationFrame(step)});
 $('reset').addEventListener('click',()=>{camera.position.set(420,330,500);orbit.target.set(0,0,0);orbit.update()});
-function resize(){const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h,false)}new ResizeObserver(resize).observe(stage);resize();rebuild();renderer.setAnimationLoop(()=>{orbit.update();renderer.render(scene,camera)});
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/Math.max(h,1);camera.updateProjectionMatrix();renderer.setSize(w,h,false)}new ResizeObserver(resize).observe(stage);resize();rebuild();renderer.setAnimationLoop(()=>{if(document.hidden)return;orbit.update();renderer.render(scene,camera)});
 </script></body></html>
