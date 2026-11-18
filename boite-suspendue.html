@@ -34,7 +34,7 @@ footer{margin-top:23px;text-align:center;color:#869ba5;font-size:12px}
 <body>
 <header><div class="brand"><div class="mark">L'</div><div><strong>L'Ouest Packaging</strong><small>Structural Packaging · Boîte à suspendre</small></div></div><a class="back" href="./index.html">↩ العودة للموقع الرئيسي</a></header>
 <main>
-<div class="intro"><div><h1>📦 العلبة المعلّقة · معاينة الديكارت والتجميع</h1><p>مخطط مسطّح 2D مستند إلى ملف <b dir="ltr">boite(1).pdf</b>، بجانبه مجسم تفاعلي يوضّح اتجاه الطي والألسنة وفتحتَي التعليق.</p></div><span class="chip">تصحيح اتجاه الطي · نسخة مراجعة</span></div>
+<div class="intro"><div><h1>📦 العلبة المعلّقة · معاينة الديكارت والتجميع</h1><p>مخطط مسطّح 2D مستخرج من إحداثيات ملف <b dir="ltr">boite(1).pdf</b>، بجانبه مجسم تفاعلي يوضّح اتجاه الطي والألسنة وفتحتَي التعليق.</p></div><span class="chip">تصحيح اتجاه الطي · نسخة مراجعة</span></div>
 <div class="layout">
 <section class="card" aria-label="معاينة العلبة ثلاثية الأبعاد">
 <div class="head"><h2>01 · تجميع العلبة ثلاثي الأبعاد</h2><span class="sub">اسحب · افتح · أغلق</span></div>
@@ -47,46 +47,13 @@ footer{margin-top:23px;text-align:center;color:#869ba5;font-size:12px}
 </div>
 </section>
 <section class="card" aria-label="المخطط المسطح ثنائي الأبعاد">
-<div class="head"><h2>02 · المخطط الأصلي 2D</h2><div class="legend"><span><b class="cut"></b> Cut / قص</span><span><b class="crease"></b> Crease / طي</span></div></div>
+<div class="head"><h2>02 · Die-cut من مرجع PDF</h2><div class="legend"><span><b class="cut"></b> Cut / قص</span><span><b class="crease"></b> Crease / طي</span></div></div>
 <div class="diecut-annotations"><button class="step active" type="button" data-part="all">المخطط كامل</button><button class="step" type="button" data-part="hanger">التعليق</button><button class="step" type="button" data-part="lid">الغطاء</button><button class="step" type="button" data-part="sides">الألسنة</button></div>
 <div class="svg-frame">
-<svg id="diecut" viewBox="-12 -12 909 920" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="مخطط diecut لعلبة تعليق، خطوط حمراء للقص وخضراء للطي">
-<g id="highlights" opacity=".26">
-<rect data-group="lid" x="35" y="98" width="255" height="201" rx="10" fill="#e6b778" />
-<rect data-group="hanger" x="460" y="1" width="255" height="298" rx="7" fill="#4cbdaf"/>
-<rect data-group="sides" x="290" y="171" width="170" height="128" rx="8" fill="#98bddb"/>
-<rect data-group="sides" x="715" y="171" width="169" height="128" rx="8" fill="#98bddb"/>
-</g>
-<g stroke="#e73b46" stroke-width="2.7" stroke-linejoin="round" stroke-linecap="round" fill="none">
-<!-- Glue tab on the left of the FIRST wide panel -->
-<path d="M35 299 L1 308 V715 L35 724"/>
-<!-- Panel 1 tuck lid, including rounded locking tab -->
-<path d="M35 299 V133 M290 299 V133 M35 133 V131 H49"/>
-<path d="M276 131 H290 V133 M36.4 130.7 C37.1 117.5 44.3 105.6 55.6 98.8 L269.5 98.8 C280.8 105.6 288.0 117.5 288.7 130.7"/>
-<!-- Top side flaps -->
-<path d="M290 299 V171 H446 L451.7 290.1 L460 299 M715 299 L723.8 290.1 L729.5 171 H884 V299"/>
-<!-- Double hanging panel with two aligned suspension slots -->
-<path d="M460 299 V1 H715 V299"/>
-<path d="M552.3 107.3 H575.5 C580.7 98.3 595.2 98.3 600.0 107.3 H623.2 A7.09 7.09 0 0 1 623.2 121.5 H600 C595.1 133.6 580.2 133.6 575.5 121.5 H552.3 A7.09 7.09 0 0 1 552.3 107.3 Z"/>
-<path d="M552.3 190.9 H574.7 C579.3 181.2 595.7 181.2 600.8 190.9 H623.2 A8.5 8.5 0 0 1 623.2 207.9 H600.8 C596.3 217.8 579.6 217.8 574.7 207.9 H552.3 A8.5 8.5 0 0 1 552.3 190.9 Z"/>
-<!-- Side outer edge -->
-<path d="M884 299 V724"/>
-<!-- Bottom flap separation and cut edges -->
-<path d="M35 724 V894 H290 V724 M290 894 H460 V724 M460 894 H715 V724 M715 894 H884 V724"/>
-</g>
-<g stroke="#089a58" stroke-width="2.7" stroke-linecap="round" fill="none">
-<!-- 4 body panels -->
-<path d="M35 299 V724 M290 299 V724 M460 299 V724 M715 299 V724"/>
-<!-- Top and bottom crease -->
-<path d="M35 299 H290 M290 299 H460 M460 299 H715 M715 299 H884"/>
-<path d="M35 724 H290 M290 724 H460 M460 724 H715 M715 724 H884"/>
-<!-- Lid tuck fold, hanger double fold -->
-<path d="M49 133 H276 M460 157 H715"/>
-</g>
-</svg>
+<svg id="diecut" viewBox="-7 -7 899 909" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="نسخة متجهية من خطوط القص والطي الأصلية في ملف boite(1).pdf"><g id="highlights" opacity=".26"></g><path id="sourceCut" stroke="#ed1c24" stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt" fill="none" d="M883.99,723.83 L883.99,298.64 M35.02,298.64 L1,307.75 L1,714.72 L35.02,723.83 M290.13,171.08 L290.13,132.81 M35.02,132.81 L35.02,298.64 M290.13,132.81 L290.13,130.69 L275.96,130.69 L275.96,137.06 M35.02,132.81 L35.02,130.69 L49.19,130.69 L49.19,137.06 M288.72,130.69 C288.01,117.53 280.82,105.58 269.53,98.8 M36.43,130.69 C37.14,117.53 44.33,105.58 55.62,98.8 L269.53,98.8 M460.21,298.64 L460.21,156.91 M715.33,156.91 L715.33,298.64 M460.21,156.91 L460.21,1 L715.33,1 L715.33,156.91 M600.05,121.47 C596.13,128.25 587.46,130.57 580.69,126.66 C578.53,125.42 576.74,123.63 575.5,121.47 L552.34,121.47 M600.05,121.47 L623.2,121.47 M580.69,102.11 C587.46,98.2 596.13,100.52 600.05,107.3 M580.69,102.11 C578.53,103.36 576.74,105.14 575.5,107.3 M623.2,107.3 L600.05,107.3 M575.5,107.3 L552.34,107.3 M623.2,121.47 C627.12,121.47 630.29,118.3 630.29,114.39 C630.29,110.47 627.12,107.3 623.2,107.3 M552.34,121.47 C548.42,121.47 545.25,118.3 545.25,114.39 C545.25,110.47 548.42,107.3 552.34,107.3 M600.84,190.92 C596.14,183.7 586.48,181.66 579.27,186.36 C577.45,187.54 575.89,189.1 574.7,190.92 L552.34,190.92 M600.84,190.92 L623.2,190.92 M579.27,212.49 C586.48,217.19 596.14,215.15 600.84,207.93 M579.27,212.49 C577.45,211.31 575.89,209.75 574.7,207.93 M623.2,207.93 L600.84,207.93 M574.7,207.93 L552.34,207.93 M623.2,190.92 C627.9,190.92 631.71,194.73 631.71,199.43 C631.71,204.12 627.9,207.93 623.2,207.93 M552.34,190.92 C547.64,190.92 543.83,194.73 543.83,199.43 C543.83,204.12 547.64,207.93 552.34,207.93 M883.99,723.83 L883.99,893.91 M715.33,893.91 L883.99,893.91 M290.13,893.91 L460.21,893.91 M715.33,723.83 L715.33,893.91 L460.21,893.91 L460.21,723.83 M290.13,723.83 L290.13,893.91 L35.02,893.91 L35.02,723.83 M290.13,171.08 L446.04,171.08 L451.71,290.13 L460.21,298.64 M290.13,298.64 L290.13,171.08 M883.99,171.08 L729.5,171.08 L723.83,290.13 L715.33,298.64 M883.99,298.64 L883.99,171.08"/><path id="sourceCrease" stroke="#00a650" stroke-width="2" stroke-linejoin="miter" stroke-linecap="butt" fill="none" d="M290.13,723.83 L290.13,298.64 M460.21,723.83 L460.21,298.64 M715.33,298.64 L715.33,723.83 M35.02,723.83 L35.02,298.64 M35.02,297.22 L290.13,297.22 M275.96,132.81 L49.19,132.81 M460.21,298.64 L715.33,298.64 M715.33,156.91 L460.21,156.91 M883.99,723.83 L715.33,723.83 M460.21,723.83 L290.13,723.83 M460.21,725.25 L715.33,725.25 M35.02,725.25 L290.13,725.25 M460.21,298.64 L290.13,298.64 M715.33,298.64 L883.99,298.64"/></svg>
 </div>
 <div class="specs"><div><small>واجهات عريضة</small><strong>2 × 255.1</strong></div><div><small>جوانب ضيقة</small><strong>≈ 170</strong></div><div><small>ارتفاع الجسم</small><strong>425.2</strong></div></div>
-<div class="pads"><p class="hint">القيم المعروضة بوحدات رسم ملف PDF، <b>وليست أبعادًا مؤكدة بالميليمتر</b>. الأحمر للقطع والأخضر للتخديد. مخطط العرض ليس ملفًا معتمدًا للسكاكين.</p></div>
+<div class="pads"><p class="hint">الخطوط والأقواس معاد رسمها من عناصر ملف PDF الأصلي، مع تقريب الإحداثيات إلى 0.01 وحدة رسم. <b>هذه ليست ميليمترات إنتاج مؤكدة.</b> المخطط يحتاج تحققًا هندسيًا قبل اعتماد السكاكين.</p></div>
 </section>
 </div>
 <section class="notes"><strong>كيف تُجمع العلبة؟</strong><ol><li>اطوِ لسان اللصق الجانبي لتكوين جسم بأربع واجهات: عريضة، ضيقة، عريضة، ضيقة.</li><li>اطوِ لوح التعليق المتصل بالواجهة العريضة الخلفية عند الخط الأخضر؛ تتطابق فتحتي التعليق بعد الطي.</li><li>اطوِ الألسنة الصغيرة الموجودة أعلى الجانبين إلى الداخل.</li><li>أنزل الغطاء المتصل بالواجهة العريضة الأمامية، وأدخل لسان الإقفال خلف الحافة الخلفية.</li><li>اطوِ ألسنة القاع حسب ترتيب التجميع الصحيح بعد التحقق من نموذج كرتوني.</li></ol><span class="warning">تنبيه هندسي: هذه محاكاة تعليمية مشتقة من مرجع PDF، وليست مصادقة على صلاحية الديكارت للإنتاج. مقاسات الميليمتر، السماكة، سماحات الطي، موضع فتحات التعليق والقاع تتطلب قياسًا وتجربة قص وتجميع فعلية.</span></section>
@@ -149,7 +116,7 @@ range.oninput=function(){set(Number(range.value)/100);};
 svg.addEventListener('pointerdown',function(e){grabbed=e.clientX;svg.setPointerCapture(e.pointerId);});
 svg.addEventListener('pointermove',function(e){if(grabbed!==null){angle+=(e.clientX-grabbed)*.007;grabbed=e.clientX;render();}});
 svg.addEventListener('pointerup',function(){grabbed=null;});svg.addEventListener('pointercancel',function(){grabbed=null;});
-Array.prototype.forEach.call(document.querySelectorAll('.step'),function(btn){btn.onclick=function(){var target=btn.getAttribute('data-part');Array.prototype.forEach.call(document.querySelectorAll('.step'),function(b){b.classList.toggle('active',b===btn);});Array.prototype.forEach.call(document.querySelectorAll('[data-group]'),function(node){node.style.opacity=(target==='all'||node.getAttribute('data-group')===target)?'1':'.05';});};});
+Array.prototype.forEach.call(document.querySelectorAll('.step'),function(btn){btn.onclick=function(){var target=btn.getAttribute('data-part');Array.prototype.forEach.call(document.querySelectorAll('.step'),function(b){b.classList.toggle('active',b===btn);});var overlays={hanger:'<rect x="460.21" y="1" width="255.12" height="297.64" fill="#4cbdaf"/>',lid:'<path d="M35.02 298.64 V130.69 Q36.4 111 55.62 98.80 H269.53 Q289 110 290.13 130.69 V298.64 Z" fill="#e6b778"/>',sides:'<path d="M290.13 298.64 V171.08 H446.04 L451.71 290.13 L460.21 298.64 Z M715.33 298.64 L723.83 290.13 L729.5 171.08 H883.99 V298.64 Z" fill="#98bddb"/>'};document.getElementById('highlights').innerHTML=overlays[target]||'';};});
 render();
 })();
 </script>
